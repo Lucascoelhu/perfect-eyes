@@ -3,39 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Um Presente Especial</title>
+    <title>Para Larissa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primaria: #a29bfe; /* Lilás vibrante */
-            --secundaria: #d63031; /* Cor para corações */
-            --fundo-claro: #f8f7ff;
-            --texto: #4b4b4b;
+            --lilás-claro: #f3e5f5;
+            --lilás-medio: #ce93d8;
+            --lilás-foco: #9c27b0;
+            --texto-cor: #2d3436;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--fundo-claro);
-            overflow-x: hidden;
+            margin: 0; padding: 0;
+            background-color: var(--lilás-claro);
+            font-family: 'Lora', serif;
+            color: var(--texto-cor);
+            scroll-behavior: smooth;
         }
 
-        /* --- LOGO FIXO --- */
-        .logo-top {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 60px;
-            height: 60px;
-            z-index: 1100;
-            border-radius: 50%;
-            background: white;
-            padding: 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        /* --- TELA DE SENHA --- */
+        /* --- TELA DE ACESSO --- */
         #bloqueio {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -44,8 +30,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            transition: all 0.8s ease;
+            z-index: 2000;
+            transition: all 1s ease-in-out;
             color: white;
             text-align: center;
         }
@@ -54,128 +40,194 @@
             padding: 15px;
             font-size: 1.5rem;
             border-radius: 50px;
-            border: none;
+            border: 2px solid rgba(255,255,255,0.5);
             text-align: center;
-            width: 200px;
-            letter-spacing: 10px;
-            margin-top: 20px;
+            width: 180px;
             outline: none;
-            color: #6c5ce7;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            margin-top: 20px;
+            backdrop-filter: blur(5px);
         }
 
         /* --- CONTEÚDO --- */
         #conteudo {
             display: none;
             opacity: 0;
-            padding: 100px 20px 50px;
-            transition: opacity 1s ease;
+            transition: opacity 2s ease;
+            padding-bottom: 100px;
         }
 
-        .cartao {
-            background: white;
-            max-width: 600px;
+        .header-presente {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .logo-elefante {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .container-carta {
+            max-width: 700px;
             margin: 0 auto;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(162, 155, 254, 0.2);
+            background: white;
+            padding: 50px;
+            border-radius: 2px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            line-height: 1.8;
             position: relative;
-            z-index: 10;
         }
 
-        .desenho {
+        .desenho-fisico {
             width: 100%;
-            border-radius: 20px;
-            margin: 20px 0;
-            border: 4px dashed var(--primaria);
+            max-width: 500px;
+            display: block;
+            margin: 30px auto;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        h1 { color: #6c5ce7; margin-bottom: 10px; }
-        p { color: var(--texto); line-height: 1.8; font-size: 1.1rem; }
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: var(--lilás-foco);
+            margin-bottom: 30px;
+        }
 
-        /* --- ANIMAÇÃO LILÁS --- */
-        .flutuante {
-            position: absolute;
-            color: var(--primaria);
+        .paragrafo {
+            margin-bottom: 25px;
+            text-align: justify;
+            white-space: pre-line; /* Mantém as quebras de linha do seu texto */
+        }
+
+        /* --- ANIMAÇÃO DE FUNDO --- */
+        .petala {
+            position: fixed;
+            color: var(--lilás-medio);
             pointer-events: none;
-            animation: subir linear infinite;
-            z-index: 1;
-            opacity: 0.6;
+            z-index: -1;
+            animation: cair linear infinite;
         }
 
-        @keyframes subir {
-            from { transform: translateY(100vh) rotate(0deg); }
-            to { transform: translateY(-10vh) rotate(360deg); }
+        @keyframes cair {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        @media (max-width: 600px) {
+            .container-carta { padding: 25px; margin: 10px; }
+            h1 { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <img src="Elefante.png" alt="Logo" class="logo-top">
-
     <div id="bloqueio">
-        <h2 style="font-weight: 300;">Oi! Digite a senha de 4 dígitos <br> para ver sua surpresa:</h2>
+        <img src="Elefante.png" alt="Logo" style="width: 100px; margin-bottom: 20px;">
+        <h2>Para Larissa Pimentel</h2>
+        <p>Digite o código especial:</p>
         <input type="password" id="senha" class="input-senha" maxlength="4" autofocus>
-        <p id="erro" style="margin-top: 15px; display: none; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 20px;">Ops! Tente novamente... 🐘</p>
     </div>
 
     <div id="conteudo">
-        <div class="cartao">
-            <h1>Para você...</h1>
-            
-            <img src="meu-desenho.jpg" alt="Meu desenho para você" class="desenho">
+        <div class="header-presente">
+            <img src="Elefante.png" alt="Elefante Logo" class="logo-elefante">
+            <h1>Larissa Pimentel (Lariê)</h1>
+        </div>
 
-            <div style="text-align: left;">
-                <p><strong>Por onde eu começo?</strong></p>
-                <p>Quero que saiba que cada traço desse desenho foi feito pensando em você. Adoro a forma como seus olhos brilham quando você ri, o jeito doce que você fala e como tudo fica mais leve quando você está por perto.</p>
-                <p>Você é uma pessoa incrível e merece o mundo. Espero que esse pequeno gesto te faça sorrir hoje! ✨</p>
+        <div class="container-carta">
+            <img src="Olhos.jpg" alt="Meu desenho para você" class="desenho-fisico">
+
+            <div class="paragrafo">
+                Minha vida sempre foi sem graça. Não vivi muitas aventuras no decorrer da minha vida. Eu sempre gostei de ficar na minha, sabe? Para muito é "não aproveitar a vida". Talvez sim, mas também eu não diria isso porque pra mim, eu tava vivendo do mesmo jeito, só que de forma diferente.
+
+                Foi quando te vi pela primeira vez. Uma 'anja', por sinal. 
+                Sua beleza ascendeu os olhos de todos ali naquela loja. 
+
+                Seu cabelo comprido e solto balançando quando caminhava como se estivesse dançando com seus movimentos. 
+
+                Seu sorriso único de canto com lábios fechados. 
+                Sua risada escandalosa como se quisesse dar um tapa em algo, demostrando felicidades e surpresa. 
+                E sua risada real; essa te deixa muito vulnerável. É como se viesse do fundo da alma que não é todo mundo que você permite ver. Essa é como se você tivesse muito segura com alguém pra realmente se sentir VOCÊ. 
+
+                Não há algo tão prazeroso quanto o cheiro de sua pele. Macia. Que a toca, não esquece, jamais. A sensação de paz que emana do seu toque misturado com o cheiro do seu perfume, é algo raro, único. 
+
+                Seus olhos. Ah, esses olhos... Dizem por aí que os olhos são janelas da alma. É pela janela que você ver o campo, o quintal... sem se expor. São neles que está verdadeiramente você. Neles estão todas suas decisões, desejos e a paz. Foram neles que eu me prendi à você por não conseguir desvendar o que me fez querer ficar e ficar. Neles que eu me apaixonei por você de uma forma que não tenho como explicar. Já tive sentimentos durante minha vida, mas por você, justamente você, eu daria literalmente minha vida por você só pra não ver seus olhos tristes. 
+
+                Escrevo agora com uma dor no peito por saber que não posso te ter. Não posso ter seus olhos só pra mim. Não posso te ter, e isso tira a maior parte do sentimento em mim que tive por você. É como se rasgasse meu coração. 
+                Você literalmente me teve em suas mãos. Cada decisão que você tomava, eu estava ali fazendo parte. Quando eram decisões boas, meu coração se alegrava de forma não tranquila que dava prazer em aproveitar o dia. 
+
+                Eu entendo algumas decisões que tomou. Eu sei que não é fácil sair de um relacionamento ileso; principalmente quando já teve mais de anos. 
+                Eu só queria poder te curar dessas feridas. Eu estava disposto a fazer qualquer coisa por você. 
+
+                Só que, diferente do que eu queria ser, não sou tão seguro. Não sou tão forte. Não sou tão inteligente quanto pensam. Não sou essa pessoa legal quanto pareço. Eu sou fraco, mas não quero parecer. 
+                Sou inseguro quando se trata de sentimentos porque sempre, sempre as pessoas saem. E a pior parte é que sempre saem dizendo um monte de coisas boas. 
+
+                Eu não entendo. "Ser bom com alguém nos tornamos ruins pra elas?". Levo essa pergunta comigo desde sempre. 
+
+                Eu só queria ter uma certeza de que eu fui alguém importante na sua vida. E que, qualquer coisa boa que acontecer, que possa se lembrar de mim. 
+                Quando alguém parte, é o sentimento criado que permanece. 
+
+                Larissa, eu espero que você seja a mulher mais feliz nessa cidade de Jacareí / São Paulo / Brasil / Continente / Planeta / Sistema solar / Via láctea / Universo / Multiverso e o Infinito.. 
+                Quero que seja tão feliz que os sentimentos de tristezas se percam diante da sua felicidade. 
+                Desejo que, todos os seus sonhos se realizem e que passe na faculdade e seja a mulher que sempre sonhou. 
+
+                Você foi e é a mulher que eu mais admirei na minha vida até agora. 
+                A que mais me fez sentir emoções. A que despertou algo novo que eu nunca imaginaria que existia. 
+                Eu juro pela minha vida, você foi a mulher que eu realmente desejei pra ter pro resto da minha vida. 
+                Só que como não sou eu e nem ninguém que controla o nosso destino e sim, Deus. Eu fui útil pra você como Ponte. 
+                Tem gente que é o amor da vida de alguém e tem gente que é apenas uma ponte para o amor da vida dela. 
+
+                Posso não ser uma pessoa boa, mas se tem uma coisa que eu falo e posso sofrer mas eu cumpro é uma promessa. E eu te prometi que, se precisar de mim, pode contar comigo independente do que aconteça, independente da ocasia e independente do que for, pode contar comigo. Se não tiver no meu alcance, eu procuro um jeito de dar.
+
+                Eu queria poder te escrever mais, porém não sou a melhor pessoa pra isso. 
+
+                Eu te amei e ainda amo você. 
+                Amo sua pessoa. 
+
+                Você é incrível, Larissa.
             </div>
-
-            <h2 style="color: var(--primaria); margin-top: 40px;">Com muito amor! 💜</h2>
+            
+            <p style="text-align: center; font-family: 'Dancing Script'; font-size: 2rem; color: var(--lilás-foco);">Com carinho.</p>
         </div>
     </div>
 
     <script>
         const inputSenha = document.getElementById('senha');
-        const telaBloqueio = document.getElementById('bloqueio');
-        const telaConteudo = document.getElementById('conteudo');
-        const msgErro = document.getElementById('erro');
+        const bloqueio = document.getElementById('bloqueio');
+        const conteudo = document.getElementById('conteudo');
 
         inputSenha.addEventListener('input', () => {
-            if (inputSenha.value === "4691") {
-                // Esconder tela de bloqueio
-                telaBloqueio.style.opacity = "0";
-                telaBloqueio.style.transform = "scale(1.1)";
-                
+            if(inputSenha.value === "4691") {
+                bloqueio.style.opacity = "0";
                 setTimeout(() => {
-                    telaBloqueio.style.display = "none";
-                    telaConteudo.style.display = "block";
-                    document.body.style.overflowY = "auto";
+                    bloqueio.style.display = "none";
+                    conteudo.style.display = "block";
                     setTimeout(() => { 
-                        telaConteudo.style.opacity = "1"; 
-                        gerarAnimacao();
-                    }, 50);
-                }, 800);
-            } else if (inputSenha.value.length === 4) {
-                msgErro.style.display = "block";
-                inputSenha.value = "";
-                // Balançar input para indicar erro
-                inputSenha.style.animation = "shake 0.3s";
-                setTimeout(() => { inputSenha.style.animation = ""; }, 300);
+                        conteudo.style.opacity = "1"; 
+                        iniciarAnimacao();
+                    }, 100);
+                }, 1000);
             }
         });
 
-        function gerarAnimacao() {
-            const icones = ["💜", "✨", "🐘", "🌸"];
+        function iniciarAnimacao() {
+            const simbolos = ["💜", "✨", "🌸", "☁️"];
             setInterval(() => {
-                const el = document.createElement('div');
-                el.classList.add('flutuante');
-                el.innerText = icones[Math.floor(Math.random() * icones.length)];
-                el.style.left = Math.random() * 100 + "vw";
-                el.style.fontSize = (Math.random() * 20 + 10) + "px";
-                el.style.animationDuration = (Math.random() * 5 + 3) + "s";
-                document.body.appendChild(el);
-                setTimeout(() => { el.remove(); }, 8000);
-            }, 500);
+                const p = document.createElement('div');
+                p.classList.add('petala');
+                p.innerText = simbolos[Math.floor(Math.random() * simbolos.length)];
+                p.style.left = Math.random() * 100 + "vw";
+                p.style.fontSize = (Math.random() * 20 + 10) + "px";
+                p.style.animationDuration = (Math.random() * 5 + 5) + "s";
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 10000);
+            }, 600);
         }
     </script>
 </body>
