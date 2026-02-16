@@ -4,20 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para Larissa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --lilás-claro: #f3e5f5;
-            --lilás-medio: #ce93d8;
-            --lilás-foco: #9c27b0;
-            --texto-cor: #2d3436;
+            --lavanda-claro: #f8f4fc;
+            --lavanda-medio: #d4c4e0;
+            --lavanda-foco: #9b7cb6;
+            --roxo-profundo: #6b4c7a;
+            --dourado: #d4af37;
+            --texto: #2c242b;
+            --texto-suave: #5a4f58;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body, html {
-            margin: 0; padding: 0;
-            background-color: var(--lilás-claro);
-            font-family: 'Lora', serif;
-            color: var(--texto-cor);
+            background-color: var(--lavanda-claro);
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--texto);
+            overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
@@ -25,29 +34,94 @@
         #bloqueio {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 50%, #a29bfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            transition: all 1s ease-in-out;
+            transition: opacity 1.5s ease-in-out, visibility 1.5s;
             color: white;
             text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .logo-elefante-login {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 10px 30px rgba(255,255,255,0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .titulo-login {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: fadeInDown 1s ease;
+        }
+
+        .subtitulo-login {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: fadeInUp 1s ease 0.3s both;
         }
 
         .input-senha {
-            padding: 15px;
-            font-size: 1.5rem;
+            padding: 18px 25px;
+            font-size: 1.8rem;
             border-radius: 50px;
-            border: 2px solid rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.3);
             text-align: center;
-            width: 180px;
+            width: 200px;
+            letter-spacing: 8px;
             outline: none;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.15);
             color: white;
-            margin-top: 20px;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            font-family: 'Montserrat', sans-serif;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .input-senha:focus {
+            border-color: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .input-senha::placeholder {
+            color: rgba(255,255,255,0.5);
+            font-size: 1.2rem;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- CONTEÚDO --- */
@@ -55,145 +129,380 @@
             display: none;
             opacity: 0;
             transition: opacity 2s ease;
-            padding-bottom: 100px;
+            position: relative;
         }
 
         .header-presente {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px 40px;
+            position: relative;
+            overflow: hidden;
         }
 
         .logo-elefante {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             margin-bottom: 20px;
+            opacity: 0.6;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            animation: fadeInScale 1.5s ease;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 0.6; transform: scale(1); }
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            color: var(--roxo-profundo);
+            margin-bottom: 10px;
+            font-weight: 600;
+            animation: revealText 2s ease;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+            animation: expandLine 2s ease 1s forwards;
+        }
+
+        @keyframes expandLine {
+            to { width: 200px; }
+        }
+
+        .subtitulo-nome {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--texto-suave);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 2s ease 0.5s forwards;
+        }
+
+        @keyframes revealText {
+            from { clip-path: inset(0 100% 0 0); }
+            to { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 0.8; }
         }
 
         .container-carta {
-            max-width: 700px;
-            margin: 0 auto;
+            max-width: 800px;
+            margin: 0 auto 100px;
             background: white;
-            padding: 50px;
-            border-radius: 2px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
-            line-height: 1.8;
+            padding: 60px 70px;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(107, 76, 122, 0.1);
+            line-height: 2;
             position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 1.5s ease 0.8s forwards;
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container-carta::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(155, 124, 182, 0.2);
+            pointer-events: none;
+            border-radius: 2px;
         }
 
         .desenho-fisico {
             width: 100%;
             max-width: 500px;
             display: block;
-            margin: 30px auto;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 0 auto 50px;
+            border-radius: 4px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: scale(0.95);
+            animation: imageReveal 1.5s ease 1s forwards;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
         }
 
-        h1 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 3rem;
-            color: var(--lilás-foco);
-            margin-bottom: 30px;
+        .desenho-fisico:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        @keyframes imageReveal {
+            to { opacity: 1; transform: scale(1); }
         }
 
         .paragrafo {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             text-align: justify;
-            white-space: pre-line; /* Mantém as quebras de linha do seu texto */
+            font-size: 1.15rem;
+            color: var(--texto);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease forwards;
         }
 
-        /* --- ANIMAÇÃO DE FUNDO --- */
-        .petala {
+        .paragrafo:nth-child(2) { animation-delay: 1.2s; }
+        .paragrafo:nth-child(3) { animation-delay: 1.4s; }
+        .paragrafo:nth-child(4) { animation-delay: 1.6s; }
+        .paragrafo:nth-child(5) { animation-delay: 1.8s; }
+        .paragrafo:nth-child(6) { animation-delay: 2s; }
+        .paragrafo:nth-child(7) { animation-delay: 2.2s; }
+        .paragrafo:nth-child(8) { animation-delay: 2.4s; }
+
+        .destaque {
+            color: var(--roxo-profundo);
+            font-weight: 600;
+            font-style: italic;
+            position: relative;
+            display: inline;
+        }
+
+        .destaque::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(212, 175, 55, 0.3);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.6s ease;
+        }
+
+        .paragrafo:hover .destaque::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .citacao {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            color: var(--lavanda-foco);
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+            border-left: 3px solid var(--dourado);
+            border-right: 3px solid var(--dourado);
+            background: rgba(212, 175, 55, 0.05);
+            opacity: 0;
+            animation: fadeIn 1.5s ease 2.6s forwards;
+        }
+
+        .assinatura {
+            text-align: center;
+            margin-top: 60px;
+            opacity: 0;
+            animation: fadeIn 2s ease 3s forwards;
+        }
+
+        .assinatura p {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: var(--roxo-profundo);
+            margin-bottom: 10px;
+        }
+
+        .data {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            color: var(--texto-suave);
+            letter-spacing: 2px;
+        }
+
+        /* --- ANIMAÇÃO DE FUNDO APRIMORADA --- */
+        .particula {
             position: fixed;
-            color: var(--lilás-medio);
             pointer-events: none;
             z-index: -1;
-            animation: cair linear infinite;
+            opacity: 0;
+            animation: flutuar linear infinite;
         }
 
-        @keyframes cair {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        .petala {
+            color: rgba(155, 124, 182, 0.4);
         }
 
-        @media (max-width: 600px) {
-            .container-carta { padding: 25px; margin: 10px; }
-            h1 { font-size: 2.2rem; }
+        .estrela {
+            color: rgba(212, 175, 55, 0.6);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
+
+        @keyframes flutuar {
+            0% { 
+                transform: translateY(100vh) rotate(0deg) translateX(0); 
+                opacity: 0; 
+            }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { 
+                transform: translateY(-10vh) rotate(720deg) translateX(50px); 
+                opacity: 0; 
+            }
+        }
+
+        /* --- EFEITO DE BRILHO --- */
+        .brilho {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -2;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .brilho-1 { top: -200px; left: -200px; animation-delay: 0s; }
+        .brilho-2 { bottom: -200px; right: -200px; animation-delay: 4s; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* --- RESPONSIVO --- */
+        @media (max-width: 768px) {
+            .titulo-login { font-size: 2.2rem; }
+            h1 { font-size: 2.8rem; }
+            .container-carta { 
+                padding: 40px 30px; 
+                margin: 0 15px 50px;
+            }
+            .paragrafo { font-size: 1.05rem; }
+            .assinatura p { font-size: 2rem; }
+        }
+
+        /* --- SCROLLBAR PERSONALIZADA --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--lavanda-claro);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--lavanda-medio);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--lavanda-foco);
         }
     </style>
 </head>
 <body>
 
+    <!-- Efeitos de fundo -->
+    <div class="brilho brilho-1"></div>
+    <div class="brilho brilho-2"></div>
+
+    <!-- Tela de bloqueio -->
     <div id="bloqueio">
-        <img src="Elefante.png" alt="Logo" style="width: 100px; margin-bottom: 20px;">
-        <h2>Para Larissa Pimentel</h2>
-        <p>Digite o código especial:</p>
-        <input type="password" id="senha" class="input-senha" maxlength="4" autofocus>
+        <img src="Elefante.png" alt="Logo" class="logo-elefante-login" onerror="this.style.display='none'">
+        <h2 class="titulo-login">Para Larissa</h2>
+        <p class="subtitulo-login">Última carta especial</p>
+        <input type="password" id="senha" class="input-senha" maxlength="4" placeholder="••••" autofocus>
     </div>
 
+    <!-- Conteúdo -->
     <div id="conteudo">
         <div class="header-presente">
-            <img src="Elefante.png" alt="Elefante Logo" class="logo-elefante">
-            <h1>Larissa Pimentel (Lariê)</h1>
+            <img src="Elefante.png" alt="Elefante Logo" class="logo-elefante" onerror="this.style.display='none'">
+            <h1>Larissa Pimentel</h1>
+            <p class="subtitulo-nome">(Lariê)</p>
         </div>
 
         <div class="container-carta">
-            <img src="Olhos.jpg" alt="Meu desenho para você" class="desenho-fisico">
+            <img src="seu-desenho.jpg" alt="Meu desenho para você" class="desenho-fisico" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-family=%22sans-serif%22%3ESeu desenho aqui%3C/text%3E%3C/svg%3E'">
 
             <div class="paragrafo">
-                Minha vida sempre foi sem graça. Não vivi muitas aventuras no decorrer da minha vida. Eu sempre gostei de ficar na minha, sabe? Para muito é "não aproveitar a vida". Talvez sim, mas também eu não diria isso porque pra mim, eu tava vivendo do mesmo jeito, só que de forma diferente.
-
-                Foi quando te vi pela primeira vez. Uma 'anja', por sinal. 
-                Sua beleza ascendeu os olhos de todos ali naquela loja. 
-
-                Seu cabelo comprido e solto balançando quando caminhava como se estivesse dançando com seus movimentos. 
-
-                Seu sorriso único de canto com lábios fechados. 
-                Sua risada escandalosa como se quisesse dar um tapa em algo, demostrando felicidades e surpresa. 
-                E sua risada real; essa te deixa muito vulnerável. É como se viesse do fundo da alma que não é todo mundo que você permite ver. Essa é como se você tivesse muito segura com alguém pra realmente se sentir VOCÊ. 
-
-                Não há algo tão prazeroso quanto o cheiro de sua pele. Macia. Que a toca, não esquece, jamais. A sensação de paz que emana do seu toque misturado com o cheiro do seu perfume, é algo raro, único. 
-
-                Seus olhos. Ah, esses olhos... Dizem por aí que os olhos são janelas da alma. É pela janela que você ver o campo, o quintal... sem se expor. São neles que está verdadeiramente você. Neles estão todas suas decisões, desejos e a paz. Foram neles que eu me prendi à você por não conseguir desvendar o que me fez querer ficar e ficar. Neles que eu me apaixonei por você de uma forma que não tenho como explicar. Já tive sentimentos durante minha vida, mas por você, justamente você, eu daria literalmente minha vida por você só pra não ver seus olhos tristes. 
-
-                Escrevo agora com uma dor no peito por saber que não posso te ter. Não posso ter seus olhos só pra mim. Não posso te ter, e isso tira a maior parte do sentimento em mim que tive por você. É como se rasgasse meu coração. 
-                Você literalmente me teve em suas mãos. Cada decisão que você tomava, eu estava ali fazendo parte. Quando eram decisões boas, meu coração se alegrava de forma não tranquila que dava prazer em aproveitar o dia. 
-
-                Eu entendo algumas decisões que tomou. Eu sei que não é fácil sair de um relacionamento ileso; principalmente quando já teve mais de anos. 
-                Eu só queria poder te curar dessas feridas. Eu estava disposto a fazer qualquer coisa por você. 
-
-                Só que, diferente do que eu queria ser, não sou tão seguro. Não sou tão forte. Não sou tão inteligente quanto pensam. Não sou essa pessoa legal quanto pareço. Eu sou fraco, mas não quero parecer. 
-                Sou inseguro quando se trata de sentimentos porque sempre, sempre as pessoas saem. E a pior parte é que sempre saem dizendo um monte de coisas boas. 
-
-                Eu não entendo. "Ser bom com alguém nos tornamos ruins pra elas?". Levo essa pergunta comigo desde sempre. 
-
-                Eu só queria ter uma certeza de que eu fui alguém importante na sua vida. E que, qualquer coisa boa que acontecer, que possa se lembrar de mim. 
-                Quando alguém parte, é o sentimento criado que permanece. 
-
-                Larissa, eu espero que você seja a mulher mais feliz nessa cidade de Jacareí / São Paulo / Brasil / Continente / Planeta / Sistema solar / Via láctea / Universo / Multiverso e o Infinito.. 
-                Quero que seja tão feliz que os sentimentos de tristezas se percam diante da sua felicidade. 
-                Desejo que, todos os seus sonhos se realizem e que passe na faculdade e seja a mulher que sempre sonhou. 
-
-                Você foi e é a mulher que eu mais admirei na minha vida até agora. 
-                A que mais me fez sentir emoções. A que despertou algo novo que eu nunca imaginaria que existia. 
-                Eu juro pela minha vida, você foi a mulher que eu realmente desejei pra ter pro resto da minha vida. 
-                Só que como não sou eu e nem ninguém que controla o nosso destino e sim, Deus. Eu fui útil pra você como Ponte. 
-                Tem gente que é o amor da vida de alguém e tem gente que é apenas uma ponte para o amor da vida dela. 
-
-                Posso não ser uma pessoa boa, mas se tem uma coisa que eu falo e posso sofrer mas eu cumpro é uma promessa. E eu te prometi que, se precisar de mim, pode contar comigo independente do que aconteça, independente da ocasia e independente do que for, pode contar comigo. Se não tiver no meu alcance, eu procuro um jeito de dar.
-
-                Eu queria poder te escrever mais, porém não sou a melhor pessoa pra isso. 
-
-                Eu te amei e ainda amo você. 
-                Amo sua pessoa. 
-
-                Você é incrível, Larissa.
+                Por onde começo?
             </div>
-            
-            <p style="text-align: center; font-family: 'Dancing Script'; font-size: 2rem; color: var(--lilás-foco);">Com carinho.</p>
+
+            <div class="paragrafo">
+                Antes de tudo, saiba que este desenho é apenas uma tentativa humilde de capturar a <span class="destaque">beleza etérea</span> que seus olhos carregam. Para quem deseja verdadeiramente compreendê-la, seria necessário vê-los pessoalmente — encantar-se-iam com esse espetáculo único.
+            </div>
+
+            <div class="paragrafo">
+                Minha vida, devo confessar, sempre fluiu em tons de cinza. Não vivi grandes aventuras nem busquei emoções fortes. Preferia a quietude, a rotina serena. Para muitos, isso significa "não aproveitar a vida". Talvez tenham razão, mas eu estava contente assim — vivendo do meu jeito, nas minhas próprias cores.
+            </div>
+
+            <div class="paragrafo">
+                Até que te vi pela primeira vez.
+            </div>
+
+            <div class="paragrafo">
+                Foi como se alguém tivesse abruptamente aberto as cortinas de uma sala escura. Uma <span class="destaque">presença luminosa</span> que preencheu todo o espaço. Sua beleza não passou despercebida — ascendeu, iluminou, transformou a atmosfera daquela loja comum em algo mágico.
+            </div>
+
+            <div class="paragrafo">
+                Lembro-me do seu cabelo comprido dançando ao ritmo de seus passos, como se cada mecha celebrasse sua existência. Do seu sorriso discreto de canto, quase envergonhado, mas genuíno. Da sua risada escandalosa — aquela que parece querer abraçar o mundo — e da sua risada verdadeira, a que emerge do fundo da alma, vulnerável e rara, reservada apenas para quem te faz sentir em casa consigo mesma.
+            </div>
+
+            <div class="paragrafo">
+                Não há memória sensorial mais vívida do que o <span class="destaque">perfume da sua pele</span>. Macia, quente, impossível de esquecer. É naquele aroma que encontro paz — uma sensação de pertencimento que não sei explicar, apenas sentir.
+            </div>
+
+            <div class="paragrafo">
+                E seus olhos... Ah, esses olhos que dizem ser as janelas da alma. Neles vi o campo, o horizonte, o universo inteiro sem precisar me expor. Foram neles que me perdi, incapaz de desvendar o mistério que me fazia querer ficar. Foi neles que me apaixonei — não de forma gradual, mas em uma queda livre inexplicável. Já conheci sentimentos antes, mas por você... por você eu daria minha vida apenas para evitar ver esses olhos marejados de tristeza.
+            </div>
+
+            <div class="citacao">
+                "Será que ser bom com alguém nos torna ruins para ela?"
+            </div>
+
+            <div class="paragrafo">
+                Escrevo estas palavras com um peso no peito, sabendo que não posso te ter. Não posso reivindicar seus olhos só para mim, nem seu riso, nem sua presença. E essa impossibilidade dilacera algo profundo em mim — como se arrancassem a essência do que me fazia vibrar.
+            </div>
+
+            <div class="paragrafo">
+                Você me teve completamente em suas mãos. Cada decisão sua, eu acompanhava de coração suspenso. Quando escolhia caminhos que te faziam brilhar, meu mundo se iluminava junto. Entendo as feridas que carrega — ninguém sai ileso de anos de história. Eu apenas queria ter sido o bálsamo, o abrigo, o lugar seguro para sua cura.
+            </div>
+
+            <div class="paragrafo">
+                Confesso que não sou tão forte quanto gostaria. Sou inseguro quando se trata de amar, porque sempre, <span class="destaque">sempre</span>, as pessoas partem. E a crueldade maior é que partem elogiando, deixando perguntas sem respostas no ar.
+            </div>
+
+            <div class="paragrafo">
+                Mas se há uma coisa que posso prometer — e cumprirei mesmo que me parta ao meio — é que estarei aqui. Independentemente do tempo, da distância, das circunstâncias. Se precisar de mim, encontrará em mim um porto. E se não estiver ao meu alcance, moverei céus e terras para chegar até você.
+            </div>
+
+            <div class="paragrafo">
+                Desejo que sejas a mulher mais feliz deste universo — de Jacareí a São Paulo, do Brasil ao infinito. Que sua felicidade seja tão intensa que as tristezas se percam tentando alcançá-la. Que realize todos os sonhos, que brilhe na faculdade, que se torne exatamente quem sempre quis ser.
+            </div>
+
+            <div class="paragrafo">
+                Você foi, e continua sendo, a mulher que mais admirei em toda minha existência. A que despertou emoções que desconhecia, que mostrou que meu coração podia pulsar em frequências desconhecidas. Juro por tudo que me é sagrado: você foi a única que eu quis para sempre. Mas reconheço que nem sempre somos os protagonistas da história — às vezes somos apenas a <span class="destaque">ponte</span> que leva alguém ao seu destino final.
+            </div>
+
+            <div class="paragrafo">
+                Sei que não sou a melhor pessoa com palavras, mas precisava que soubesses: <span class="destaque">eu te amei, te amo e amarei</span> — não apenas pelo que você é, mas pelo que me fez ser. Você é, simplesmente, <span class="destaque">incrível</span>.
+            </div>
+
+            <div class="assinatura">
+                <p>Com todo o carinho do mundo,</p>
+                <p class="data">Para sempre seu</p>
+            </div>
         </div>
     </div>
 
@@ -202,33 +511,135 @@
         const bloqueio = document.getElementById('bloqueio');
         const conteudo = document.getElementById('conteudo');
 
-        inputSenha.addEventListener('input', () => {
+        inputSenha.addEventListener('input', (e) => {
             if(inputSenha.value === "4691") {
-                bloqueio.style.opacity = "0";
+                // Efeito de sucesso
+                inputSenha.style.borderColor = "#4ecdc4";
+                inputSenha.style.boxShadow = "0 0 30px rgba(78, 205, 196, 0.5)";
+                
                 setTimeout(() => {
-                    bloqueio.style.display = "none";
-                    conteudo.style.display = "block";
-                    setTimeout(() => { 
-                        conteudo.style.opacity = "1"; 
-                        iniciarAnimacao();
-                    }, 100);
-                }, 1000);
+                    bloqueio.style.opacity = "0";
+                    bloqueio.style.visibility = "hidden";
+                    
+                    setTimeout(() => {
+                        bloqueio.style.display = "none";
+                        conteudo.style.display = "block";
+                        
+                        // Scroll suave para o topo
+                        window.scrollTo(0, 0);
+                        
+                        setTimeout(() => { 
+                            conteudo.style.opacity = "1";
+                            iniciarParticulas();
+                        }, 100);
+                    }, 1500);
+                }, 500);
             }
         });
 
-        function iniciarAnimacao() {
-            const simbolos = ["💜", "✨", "🌸", "☁️"];
-            setInterval(() => {
-                const p = document.createElement('div');
-                p.classList.add('petala');
-                p.innerText = simbolos[Math.floor(Math.random() * simbolos.length)];
-                p.style.left = Math.random() * 100 + "vw";
-                p.style.fontSize = (Math.random() * 20 + 10) + "px";
-                p.style.animationDuration = (Math.random() * 5 + 5) + "s";
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 10000);
-            }, 600);
+        // Efeito sonoro visual (ondas)
+        function criarOnda(x, y) {
+            const onda = document.createElement('div');
+            onda.style.position = 'fixed';
+            onda.style.left = x + 'px';
+            onda.style.top = y + 'px';
+            onda.style.width = '20px';
+            onda.style.height = '20px';
+            onda.style.border = '2px solid rgba(212, 175, 55, 0.5)';
+            onda.style.borderRadius = '50%';
+            onda.style.transform = 'translate(-50%, -50%)';
+            onda.style.pointerEvents = 'none';
+            onda.style.zIndex = '1000';
+            onda.style.animation = 'expandOnda 1s ease-out forwards';
+            document.body.appendChild(onda);
+            
+            setTimeout(() => onda.remove(), 1000);
         }
+
+        // Adicionar animação de onda dinamicamente
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes expandOnda {
+                to { width: 100px; height: 100px; opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Clique cria ondas
+        document.addEventListener('click', (e) => {
+            if (conteudo.style.display === 'block') {
+                criarOnda(e.clientX, e.clientY);
+            }
+        });
+
+        function iniciarParticulas() {
+            const simbolos = [
+                { char: "🌸", tipo: "petala", peso: 3 },
+                { char: "✨", tipo: "estrela", peso: 2 },
+                { char: "💜", tipo: "petala", peso: 2 },
+                { char: "☁️", tipo: "petala", peso: 1 }
+            ];
+
+            // Criar partículas iniciais
+            for(let i = 0; i < 15; i++) {
+                setTimeout(() => criarParticula(simbolos), i * 300);
+            }
+
+            // Continuar criando
+            setInterval(() => {
+                criarParticula(simbolos);
+            }, 800);
+        }
+
+        function criarParticula(simbolos) {
+            const sorteio = Math.random() * 8; // Soma dos pesos
+            let acumulado = 0;
+            let selecionado = simbolos[0];
+
+            for(let s of simbolos) {
+                acumulado += s.peso;
+                if(sorteio <= acumulado) {
+                    selecionado = s;
+                    break;
+                }
+            }
+
+            const p = document.createElement('div');
+            p.classList.add('particula', selecionado.tipo);
+            p.innerText = selecionado.char;
+            p.style.left = Math.random() * 100 + "vw";
+            p.style.fontSize = (Math.random() * 15 + 10) + "px";
+            p.style.animationDuration = (Math.random() * 8 + 10) + "s";
+            p.style.animationDelay = Math.random() * 2 + "s";
+            
+            // Variação de trajeto
+            const desvio = (Math.random() - 0.5) * 100;
+            p.style.setProperty('--desvio', desvio + 'px');
+            
+            document.body.appendChild(p);
+            
+            // Remover após animação
+            setTimeout(() => {
+                if(p.parentNode) p.remove();
+            }, 20000);
+        }
+
+        // Efeito de parallax suave no scroll
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.pageYOffset;
+                    const parallax = document.querySelectorAll('.brilho');
+                    parallax.forEach((el, index) => {
+                        const speed = 0.5 + (index * 0.2);
+                        el.style.transform = `translateY(${scrolled * speed}px)`;
+                    });
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
     </script>
 </body>
 </html>
