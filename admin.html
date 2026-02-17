@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Controle de Lançamento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #d4af37, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitulo {
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .status-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .status-valor {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .status-liberado { color: #4ecdc4; }
+        .status-bloqueado { color: #ff6b6b; }
+        .status-agendado { color: #feca57; }
+
+        .grupo {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="datetime-local"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="datetime-local"]:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .botoes {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 140px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .btn-liberar {
+            background: linear-gradient(135deg, #4ecdc4, #44a3aa);
+            color: white;
+        }
+
+        .btn-liberar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-agendar {
+            background: linear-gradient(135deg, #feca57, #ff9f43);
+            color: #1a1a2e;
+        }
+
+        .btn-agendar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(254, 202, 87, 0.4);
+        }
+
+        .btn-bloquear {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .btn-bloquear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-limpar {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-limpar:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .info-box {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid #d4af37;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .contador-preview {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .preview-item {
+            text-align: center;
+        }
+
+        .preview-numero {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #d4af37;
+        }
+
+        .preview-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 25px; }
+            h1 { font-size: 2rem; }
+            .botoes { flex-direction: column; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🐘 Painel de Controle</h1>
+        <p class="subtitulo">Lançamento - Para Larissa</p>
+
+        <div class="status-box">
+            <div class="status-label">Status Atual</div>
+            <div class="status-valor" id="statusText">Verificando...</div>
+            <div class="contador-preview" id="contadorPreview" style="display: none;">
+                <div class="preview-item">
+                    <div class="preview-numero" id="prevDias">00</div>
+                    <div class="preview-label">Dias</div>
+                </div>
+                <div class="preview-item">
+                    <div class="preview-numero" id="prevHoras">00</div>
+                    <div class="preview-label">Hrs</div>
+                </div>
+                <div class="preview-item">
+                    <div class="preview-numero" id="prevMin">00</div>
+                    <div class="preview-label">Min</div>
+                </div>
+                <div class="preview-item">
+                    <div class="preview-numero" id="prevSeg">00</div>
+                    <div class="preview-label">Seg</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grupo">
+            <label>📅 Agendar Lançamento</label>
+            <input type="datetime-local" id="dataLancamento">
+        </div>
+
+        <div class="botoes">
+            <button class="btn-liberar" onclick="liberarAgora()">🚀 Liberar Agora</button>
+            <button class="btn-agendar" onclick="agendarLancamento()">⏰ Agendar</button>
+        </div>
+
+        <div class="botoes" style="margin-top: 15px;">
+            <button class="btn-bloquear" onclick="bloquearTudo()">🔒 Bloquear</button>
+            <button class="btn-limpar" onclick="limparAgendamento()">🗑️ Limpar Data</button>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Como funciona:</strong><br>
+            • <strong>Liberar Agora:</strong> Acesso imediato à página da senha<br>
+            • <strong>Agendar:</strong> Define data/hora para liberação automática<br>
+            • <strong>Bloquear:</strong> Revoga acesso e volta à tela de suspense<br>
+            • <strong>Limpar:</strong> Remove data agendada (fica "Em Breve" indefinido)
+        </div>
+    </div>
+
+    <script>
+        const CONFIG_KEY = 'larissa_lancamento_config';
+        let updateInterval;
+
+        function getConfig() {
+            const padrao = { liberado: false, dataLancamento: null };
+            const salvo = localStorage.getItem(CONFIG_KEY);
+            return salvo ? { ...padrao, ...JSON.parse(salvo) } : padrao;
+        }
+
+        function salvarConfig(config) {
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+            atualizarStatus();
+        }
+
+        function atualizarStatus() {
+            const config = getConfig();
+            const agora = new Date().getTime();
+            const statusEl = document.getElementById('statusText');
+            const previewEl = document.getElementById('contadorPreview');
+
+            // Limpar intervalo anterior
+            if (updateInterval) clearInterval(updateInterval);
+
+            if (config.liberado) {
+                statusEl.textContent = '🟢 LIBERADO (Acesso Imediato)';
+                statusEl.className = 'status-valor status-liberado';
+                previewEl.style.display = 'none';
+            } 
+            else if (config.dataLancamento) {
+                if (agora >= config.dataLancamento) {
+                    statusEl.textContent = '🟢 LIBERADO (Contador Zerado)';
+                    statusEl.className = 'status-valor status-liberado';
+                    previewEl.style.display = 'none';
+                } else {
+                    statusEl.textContent = '🟡 AGENDADO (Contando...)';
+                    statusEl.className = 'status-valor status-agendado';
+                    previewEl.style.display = 'flex';
+                    
+                    const atualizarContador = () => {
+                        const atual = new Date().getTime();
+                        const dist = config.dataLancamento - atual;
+                        
+                        if (dist <= 0) {
+                            atualizarStatus();
+                            return;
+                        }
+                        
+                        const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((dist % (1000 * 60)) / 1000);
+                        
+                        document.getElementById('prevDias').textContent = String(d).padStart(2, '0');
+                        document.getElementById('prevHoras').textContent = String(h).padStart(2, '0');
+                        document.getElementById('prevMin').textContent = String(m).padStart(2, '0');
+                        document.getElementById('prevSeg').textContent = String(s).padStart(2, '0');
+                    };
+                    
+                    atualizarContador();
+                    updateInterval = setInterval(atualizarContador, 1000);
+                }
+            } 
+            else {
+                statusEl.textContent = '🔴 BLOQUEADO (Em Breve)';
+                statusEl.className = 'status-valor status-bloqueado';
+                previewEl.style.display = 'none';
+            }
+        }
+
+        function liberarAgora() {
+            salvarConfig({ liberado: true, dataLancamento: null });
+            alert('✅ Acesso liberado! A página da Larissa está disponível imediatamente.');
+        }
+
+        function agendarLancamento() {
+            const input = document.getElementById('dataLancamento').value;
+            if (!input) {
+                alert('⚠️ Selecione uma data e hora primeiro!');
+                return;
+            }
+            
+            const timestamp = new Date(input).getTime();
+            const agora = new Date().getTime();
+            
+            if (timestamp <= agora) {
+                alert('⚠️ A data deve ser no futuro!');
+                return;
+            }
+            
+            salvarConfig({ liberado: false, dataLancamento: timestamp });
+            alert('✅ Lançamento agendado para:\n' + new Date(timestamp).toLocaleString('pt-BR'));
+        }
+
+        function bloquearTudo() {
+            if (confirm('🔒 Tem certeza que deseja bloquear o acesso? A Larissa verá a tela de "Em Breve" novamente.')) {
+                salvarConfig({ liberado: false, dataLancamento: null });
+                alert('🔒 Acesso bloqueado.');
+            }
+        }
+
+        function limparAgendamento() {
+            const config = getConfig();
+            salvarConfig({ ...config, dataLancamento: null });
+            document.getElementById('dataLancamento').value = '';
+            alert('🗑️ Data limpa. A página ficará em "Em Breve" até nova liberação.');
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarStatus();
+            
+            // Preencher input com data atual + 1 hora como sugestão
+            const agora = new Date();
+            agora.setHours(agora.getHours() + 1);
+            agora.setMinutes(0);
+            const dataMin = agora.toISOString().slice(0, 16);
+            document.getElementById('dataLancamento').min = dataMin;
+        });
+    </script>
+
+</body>
+</html>
