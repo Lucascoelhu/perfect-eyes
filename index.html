@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para Larissa</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --lavanda-claro: #f8f4fc;
@@ -100,7 +105,6 @@
             text-transform: uppercase;
         }
 
-        /* CONTADOR REGRESSIVO */
         .contador-container {
             display: flex;
             gap: 20px;
@@ -167,6 +171,26 @@
             to { transform: rotate(360deg); }
         }
 
+        .status-offline {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            z-index: 3001;
+            display: none;
+        }
+
+        .status-offline.visivel {
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
         /* --- TELA DE ACESSO (SENHA) --- */
         #bloqueio {
             position: fixed;
@@ -174,7 +198,7 @@
             background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 50%, #a29bfe 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
-            display: none; /* Inicialmente escondido */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -189,7 +213,6 @@
             display: flex;
         }
 
-        /* ELEFANTE NA TELA DE BLOQUEIO - ANTES DA SENHA */
         .elefante-bloqueio {
             width: 150px;
             height: 150px;
@@ -280,7 +303,6 @@
             position: relative;
         }
 
-        /* ELEFANTE NO CENTRO EM CIMA - PÁGINA PRINCIPAL */
         .elefante-principal-container {
             text-align: center;
             padding: 40px 20px 20px;
@@ -851,7 +873,6 @@
             .musica-info { display: none; }
         }
 
-        /* --- SCROLLBAR --- */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -906,6 +927,11 @@
         </div>
     </div>
 
+    <!-- Alerta Offline -->
+    <div class="status-offline" id="statusOffline">
+        ⚠️ Sem conexão. Usando modo local.
+    </div>
+
     <!-- 🎭 TELA DE SUSPENSE (LANÇAMENTO) -->
     <div id="tela-suspense">
         <img src="Elefante.png" alt="🐘" class="suspense-elefante" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%22100%22%3E🐘%3C/text%3E%3C/svg%3E'">
@@ -940,7 +966,7 @@
         </p>
     </div>
 
-    <!-- TELA DE BLOQUEIO (SENHA) - Inicialmente escondida -->
+    <!-- TELA DE BLOQUEIO (SENHA) -->
     <div id="bloqueio">
         <img src="Elefante.png" alt="🐘 Elefante" class="elefante-bloqueio" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2280%22%3E🐘%3C/text%3E%3C/svg%3E'; this.className='elefante-bloqueio'">
         
@@ -1029,118 +1055,198 @@
     </div>
 
     <script>
+        // ==================== CONFIGURAÇÃO FIREBASE ====================
+        
+        // 🔥 SUBSTITUA ESTAS CONFIGURAÇÕES PELAS SUAS DO FIREBASE!
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxb-5M3to-4ahXkwcVSn-rVl4vFn-ZYs4",
+            authDomain: "manu-d68f4.firebaseapp.com",
+            databaseURL: "https://manu-d68f4-default-rtdb.firebaseio.com", // ADICIONE ESTA LINHA!
+            projectId: "manu-d68f4",
+            storageBucket: "manu-d68f4.firebasestorage.app",
+            messagingSenderId: "224631826772",
+            appId: "1:224631826772:web:fc5f29ca83235837fe00c1"
+        };
+
+        // Inicializar Firebase
+        let db;
+        let usandoFirebase = false;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            usandoFirebase = true;
+            console.log("✅ Firebase conectado");
+        } catch (e) {
+            console.log("⚠️ Firebase não disponível, usando localStorage");
+            document.getElementById('statusOffline').classList.add('visivel');
+        }
+
         // ==================== SISTEMA DE LANÇAMENTO ====================
         
-        // Configuração do lançamento (pode ser alterada via localStorage pelo admin)
         const CONFIG_KEY = 'larissa_lancamento_config';
-        
-        function getLancamentoConfig() {
-            const padrao = {
-                liberado: false,
-                dataLancamento: null // null = aguardando liberação manual
-            };
-            
+        let contadorInterval;
+        let unsubscribeFirebase = null;
+
+        // Fallback para localStorage
+        function getLocalConfig() {
+            const padrao = { liberado: false, dataLancamento: null };
             const salvo = localStorage.getItem(CONFIG_KEY);
-            if (salvo) {
-                return { ...padrao, ...JSON.parse(salvo) };
-            }
-            return padrao;
+            return salvo ? { ...padrao, ...JSON.parse(salvo) } : padrao;
         }
-        
-        function salvarConfig(config) {
+
+        function salvarLocalConfig(config) {
             localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
         }
-        
-        // Verificar liberação
-        function verificarLiberacao() {
-            const config = getLancamentoConfig();
+
+        // Obter configuração (Firebase ou local)
+        async function getConfig() {
+            if (!usandoFirebase) {
+                return getLocalConfig();
+            }
+
+            try {
+                const snapshot = await db.ref('lancamento').once('value');
+                const data = snapshot.val();
+                
+                if (data) {
+                    return {
+                        liberado: data.liberado || false,
+                        dataLancamento: data.dataLancamento || null
+                    };
+                }
+                return { liberado: false, dataLancamento: null };
+            } catch (e) {
+                console.log("Erro Firebase, usando local:", e);
+                return getLocalConfig();
+            }
+        }
+
+        // Escutar mudanças em tempo real
+        function iniciarListener() {
+            if (!usandoFirebase) return;
+
+            unsubscribeFirebase = db.ref('lancamento').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    console.log("🔄 Dados atualizados do Firebase:", data);
+                    verificarStatusEAtualizar(data);
+                }
+            }, (error) => {
+                console.error("Erro no listener:", error);
+            });
+        }
+
+        function verificarStatusEAtualizar(config) {
             const agora = new Date().getTime();
             
-            // Se já está liberado manualmente
-            if (config.liberado) {
-                return true;
+            // Verificar se deve liberar
+            if (config.liberado || (config.dataLancamento && agora >= config.dataLancamento)) {
+                liberarAcesso();
+            } else {
+                // Atualizar contador visual
+                if (config.dataLancamento) {
+                    atualizarContadorVisual(config.dataLancamento);
+                }
             }
-            
-            // Se tem data de lançamento definida
-            if (config.dataLancamento) {
-                return agora >= config.dataLancamento;
-            }
-            
-            return false;
         }
-        
-        // Contador regressivo
-        let contadorInterval;
-        
-        function iniciarContador() {
-            const config = getLancamentoConfig();
-            
-            // Se não tem data definida, mostrar mensagem de "em breve" sem contador específico
-            if (!config.dataLancamento && !config.liberado) {
-                document.getElementById('dias').textContent = '--';
-                document.getElementById('horas').textContent = '--';
-                document.getElementById('minutos').textContent = '--';
-                document.getElementById('segundos').textContent = '--';
+
+        function atualizarContadorVisual(timestamp) {
+            const agora = new Date().getTime();
+            const distancia = timestamp - agora;
+
+            if (distancia <= 0) {
+                liberarAcesso();
                 return;
             }
+
+            const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+
+            document.getElementById('dias').textContent = String(dias).padStart(2, '0');
+            document.getElementById('horas').textContent = String(horas).padStart(2, '0');
+            document.getElementById('minutos').textContent = String(minutos).padStart(2, '0');
+            document.getElementById('segundos').textContent = String(segundos).padStart(2, '0');
+        }
+
+        function iniciarContadorLocal(timestamp) {
+            if (contadorInterval) clearInterval(contadorInterval);
             
             function atualizar() {
-                if (verificarLiberacao()) {
+                const agora = new Date().getTime();
+                const distancia = timestamp - agora;
+
+                if (distancia <= 0) {
+                    clearInterval(contadorInterval);
                     liberarAcesso();
                     return;
                 }
-                
-                const agora = new Date().getTime();
-                const distancia = config.dataLancamento - agora;
-                
+
                 const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
                 const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
                 const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
-                
+
                 document.getElementById('dias').textContent = String(dias).padStart(2, '0');
                 document.getElementById('horas').textContent = String(horas).padStart(2, '0');
                 document.getElementById('minutos').textContent = String(minutos).padStart(2, '0');
                 document.getElementById('segundos').textContent = String(segundos).padStart(2, '0');
             }
-            
+
             atualizar();
             contadorInterval = setInterval(atualizar, 1000);
         }
-        
+
         // Liberar acesso (transição para tela de senha)
         function liberarAcesso() {
-            clearInterval(contadorInterval);
-            
+            if (contadorInterval) clearInterval(contadorInterval);
+            if (unsubscribeFirebase) {
+                // Manter listener ativo para mudanças futuras
+            }
+
             const telaSuspense = document.getElementById('tela-suspense');
             const bloqueio = document.getElementById('bloqueio');
-            
+
+            // Verificar se já não está liberado
+            if (bloqueio.classList.contains('visivel')) return;
+
             // Animação de saída
             telaSuspense.style.opacity = '0';
             telaSuspense.style.visibility = 'hidden';
-            
+
             setTimeout(() => {
                 telaSuspense.style.display = 'none';
                 bloqueio.classList.add('visivel');
                 document.getElementById('senha').focus();
             }, 1500);
         }
-        
+
         // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            if (verificarLiberacao()) {
+        document.addEventListener('DOMContentLoaded', async () => {
+            const config = await getConfig();
+            
+            if (config.liberado || (config.dataLancamento && new Date().getTime() >= config.dataLancamento)) {
                 // Já liberado, ir direto para senha
                 document.getElementById('tela-suspense').style.display = 'none';
                 document.getElementById('bloqueio').classList.add('visivel');
+            } else if (config.dataLancamento) {
+                // Tem data definida, iniciar contador
+                iniciarContadorLocal(config.dataLancamento);
+                iniciarListener(); // Escutar mudanças do admin
             } else {
-                // Mostrar suspense com contador
-                iniciarContador();
+                // Sem data, mostrar "--" e aguardar
+                document.getElementById('dias').textContent = '--';
+                document.getElementById('horas').textContent = '--';
+                document.getElementById('minutos').textContent = '--';
+                document.getElementById('segundos').textContent = '--';
+                iniciarListener();
             }
         });
 
         // ==================== SISTEMA ORIGINAL (INALTERADO) ====================
 
-        // Playlist de músicas
         const playlist = [
             {
                 nome: "Piano Romântico",
