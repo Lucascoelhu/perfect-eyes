@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Controle de Lançamento</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -145,17 +150,6 @@
             box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
         }
 
-        .btn-login:active {
-            transform: translateY(-1px);
-        }
-
-        .login-info {
-            margin-top: 25px;
-            font-size: 0.75rem;
-            opacity: 0.4;
-            line-height: 1.6;
-        }
-
         .mensagem-erro {
             color: #ff6b6b;
             font-size: 0.85rem;
@@ -169,21 +163,28 @@
             opacity: 1;
         }
 
+        .login-info {
+            margin-top: 25px;
+            font-size: 0.75rem;
+            opacity: 0.4;
+            line-height: 1.6;
+        }
+
         /* CONTEÚDO PRINCIPAL (PAINEL) */
         #painel-admin {
             display: none;
             width: 100%;
-            max-width: 500px;
+            max-width: 900px;
             animation: fadeIn 0.8s ease;
+        }
+
+        #painel-admin.visivel {
+            display: block;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        #painel-admin.visivel {
-            display: block;
         }
 
         .container {
@@ -200,6 +201,25 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status-conexao {
+            font-size: 0.75rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-conexao.online {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+        }
+
+        .status-conexao.offline {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
         }
 
         .btn-logout {
@@ -237,11 +257,21 @@
             letter-spacing: 2px;
         }
 
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
         .status-box {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -393,6 +423,80 @@
             margin-top: 5px;
         }
 
+        /* LOGS DE ACESSO */
+        .logs-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logs-titulo {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logs-lista {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .log-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .log-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .log-item.sucesso { border-left-color: #4ecdc4; }
+        .log-item.falha { border-left-color: #ff6b6b; }
+
+        .log-data {
+            opacity: 0.6;
+            font-size: 0.75rem;
+        }
+
+        .log-ip {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .btn-limpar-logs {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-limpar-logs:hover {
+            background: rgba(255, 107, 107, 0.3);
+        }
+
         @media (max-width: 480px) {
             .login-container { padding: 40px 25px; }
             .login-titulo { font-size: 2rem; }
@@ -432,85 +536,137 @@
         </div>
     </div>
 
-    <!-- 🎛️ PAINEL ADMIN (Inicialmente oculto) -->
+    <!-- 🎛️ PAINEL ADMIN -->
     <div id="painel-admin">
         <div class="container">
             <div class="header-painel">
-                <span></span>
+                <span class="status-conexão" id="statusConexao">🟡 Conectando...</span>
                 <button class="btn-logout" onclick="fazerLogout()">🚪 Sair</button>
             </div>
             
             <h1>🐘 Painel de Controle</h1>
             <p class="subtitulo">Lançamento - Para Larissa</p>
 
-            <div class="status-box">
-                <div class="status-label">Status Atual</div>
-                <div class="status-valor" id="statusText">Verificando...</div>
-                <div class="contador-preview" id="contadorPreview" style="display: none;">
-                    <div class="preview-item">
-                        <div class="preview-numero" id="prevDias">00</div>
-                        <div class="preview-label">Dias</div>
+            <div class="grid-2">
+                <div>
+                    <div class="status-box">
+                        <div class="status-label">Status do Lançamento</div>
+                        <div class="status-valor" id="statusText">Verificando...</div>
+                        <div class="contador-preview" id="contadorPreview" style="display: none;">
+                            <div class="preview-item">
+                                <div class="preview-numero" id="prevDias">00</div>
+                                <div class="preview-label">Dias</div>
+                            </div>
+                            <div class="preview-item">
+                                <div class="preview-numero" id="prevHoras">00</div>
+                                <div class="preview-label">Hrs</div>
+                            </div>
+                            <div class="preview-item">
+                                <div class="preview-numero" id="prevMin">00</div>
+                                <div class="preview-label">Min</div>
+                            </div>
+                            <div class="preview-item">
+                                <div class="preview-numero" id="prevSeg">00</div>
+                                <div class="preview-label">Seg</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="preview-item">
-                        <div class="preview-numero" id="prevHoras">00</div>
-                        <div class="preview-label">Hrs</div>
+
+                    <div class="grupo">
+                        <label>📅 Agendar Lançamento</label>
+                        <input type="datetime-local" id="dataLancamento">
                     </div>
-                    <div class="preview-item">
-                        <div class="preview-numero" id="prevMin">00</div>
-                        <div class="preview-label">Min</div>
+
+                    <div class="botoes">
+                        <button class="btn-liberar" onclick="liberarAgora()">🚀 Liberar Agora</button>
+                        <button class="btn-agendar" onclick="agendarLancamento()">⏰ Agendar</button>
                     </div>
-                    <div class="preview-item">
-                        <div class="preview-numero" id="prevSeg">00</div>
-                        <div class="preview-label">Seg</div>
+
+                    <div class="botoes" style="margin-top: 15px;">
+                        <button class="btn-bloquear" onclick="bloquearTudo()">🔒 Bloquear</button>
+                        <button class="btn-limpar" onclick="limparAgendamento()">🗑️ Limpar Data</button>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>💡 Como funciona:</strong><br>
+                        • <strong>Liberar Agora:</strong> Acesso imediato à página da senha<br>
+                        • <strong>Agendar:</strong> Define data/hora para liberação automática<br>
+                        • <strong>Bloquear:</strong> Revoga acesso e volta à tela de suspense<br>
+                        • <strong>Limpar:</strong> Remove data agendada
                     </div>
                 </div>
-            </div>
 
-            <div class="grupo">
-                <label>📅 Agendar Lançamento</label>
-                <input type="datetime-local" id="dataLancamento">
-            </div>
-
-            <div class="botoes">
-                <button class="btn-liberar" onclick="liberarAgora()">🚀 Liberar Agora</button>
-                <button class="btn-agendar" onclick="agendarLancamento()">⏰ Agendar</button>
-            </div>
-
-            <div class="botoes" style="margin-top: 15px;">
-                <button class="btn-bloquear" onclick="bloquearTudo()">🔒 Bloquear</button>
-                <button class="btn-limpar" onclick="limparAgendamento()">🗑️ Limpar Data</button>
-            </div>
-
-            <div class="info-box">
-                <strong>💡 Como funciona:</strong><br>
-                • <strong>Liberar Agora:</strong> Acesso imediato à página da senha<br>
-                • <strong>Agendar:</strong> Define data/hora para liberação automática<br>
-                • <strong>Bloquear:</strong> Revoga acesso e volta à tela de suspense<br>
-                • <strong>Limpar:</strong> Remove data agendada (fica "Em Breve" indefinido)
+                <div>
+                    <div class="logs-section">
+                        <div class="logs-titulo">
+                            📋 Logs de Acesso
+                            <span style="font-size: 0.75rem; opacity: 0.6;">(últimos 20)</span>
+                        </div>
+                        <div class="logs-lista" id="logsLista">
+                            <div style="text-align: center; opacity: 0.5; padding: 20px;">
+                                Carregando logs...
+                            </div>
+                        </div>
+                        <button class="btn-limpar-logs" onclick="limparLogs()">🗑️ Limpar Histórico</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURAÇÕES DE SEGURANÇA
-        const SENHA_ADMIN = "4691"; // 🔑 ALTERE AQUI A SENHA DO ADMIN
-        const SESSION_KEY = 'larissa_admin_session';
-        const CONFIG_KEY = 'larissa_lancamento_config';
-        let updateInterval;
+        // ==================== CONFIGURAÇÃO FIREBASE ====================
+        
+        // 🔥 SUBSTITUA PELAS SUAS CONFIGURAÇÕES DO FIREBASE!
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxb-5M3to-4ahXkwcVSn-rVl4vFn-ZYs4",
+            authDomain: "manu-d68f4.firebaseapp.com",
+            databaseURL: "https://manu-d68f4-default-rtdb.firebaseio.com", // IMPORTANTE!
+            projectId: "manu-d68f4",
+            storageBucket: "manu-d68f4.firebasestorage.app",
+            messagingSenderId: "224631826772",
+            appId: "1:224631826772:web:fc5f29ca83235837fe00c1"
+        };
+
+        // Inicializar Firebase
+        let db;
+        let usandoFirebase = false;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            usandoFirebase = true;
+            console.log("✅ Firebase conectado");
+            document.getElementById('statusConexao').textContent = '🟢 Online (Firebase)';
+            document.getElementById('statusConexao').className = 'status-conexao online';
+        } catch (e) {
+            console.log("⚠️ Firebase erro:", e);
+            document.getElementById('statusConexao').textContent = '🔴 Offline (localStorage)';
+            document.getElementById('statusConexao').className = 'status-conexao offline';
+        }
 
         // ==================== SISTEMA DE LOGIN ====================
 
-        function verificarSenha() {
+        const SENHA_ADMIN = "4691";
+        const SESSION_KEY = 'larissa_admin_session';
+        let updateInterval;
+        let logsListener = null;
+
+        async function verificarSenha() {
             const input = document.getElementById('inputSenhaAdmin');
             const mensagemErro = document.getElementById('mensagemErro');
             const senhaDigitada = input.value;
 
             if (senhaDigitada === SENHA_ADMIN) {
-                // Senha correta - criar sessão
+                // Registrar log de acesso bem-sucedido
+                await registrarLog('sucesso', 'Login administrativo');
+                
                 sessionStorage.setItem(SESSION_KEY, 'true');
                 mostrarPainel();
             } else {
-                // Senha incorreta
+                // Registrar tentativa falha
+                await registrarLog('falha', 'Tentativa de acesso negada');
+                
                 input.classList.add('erro');
                 mensagemErro.classList.add('visivel');
                 input.value = '';
@@ -531,7 +687,7 @@
             setTimeout(() => {
                 telaLogin.style.display = 'none';
                 painelAdmin.classList.add('visivel');
-                atualizarStatus();
+                inicializarPainel();
             }, 800);
         }
 
@@ -543,33 +699,138 @@
         function verificarSessao() {
             const logado = sessionStorage.getItem(SESSION_KEY);
             if (logado === 'true') {
-                // Já está logado, mostrar painel direto
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('painel-admin').classList.add('visivel');
-                atualizarStatus();
+                inicializarPainel();
             }
         }
 
-        // Enter para login
-        document.getElementById('inputSenhaAdmin')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') verificarSenha();
-        });
+        // ==================== LOGS DE ACESSO ====================
 
-        // ==================== SISTEMA DE CONTROLE ====================
+        async function registrarLog(tipo, acao) {
+            const agora = new Date();
+            const log = {
+                tipo: tipo, // 'sucesso' ou 'falha'
+                acao: acao,
+                data: agora.toISOString(),
+                timestamp: agora.getTime(),
+                userAgent: navigator.userAgent.substring(0, 100),
+                // Não temos IP real no cliente, mas podemos gerar um identificador
+                sessionId: Math.random().toString(36).substring(2, 15)
+            };
 
-        function getConfig() {
-            const padrao = { liberado: false, dataLancamento: null };
-            const salvo = localStorage.getItem(CONFIG_KEY);
-            return salvo ? { ...padrao, ...JSON.parse(salvo) } : padrao;
+            if (usandoFirebase) {
+                try {
+                    await db.ref('logs').push(log);
+                } catch (e) {
+                    console.error("Erro ao salvar log:", e);
+                }
+            } else {
+                // Fallback local
+                const logs = JSON.parse(localStorage.getItem('larissa_logs') || '[]');
+                logs.unshift(log);
+                if (logs.length > 50) logs.pop(); // Manter apenas 50
+                localStorage.setItem('larissa_logs', JSON.stringify(logs));
+            }
         }
 
-        function salvarConfig(config) {
-            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+        function carregarLogs() {
+            if (usandoFirebase) {
+                logsListener = db.ref('logs').orderByChild('timestamp').limitToLast(20).on('value', (snapshot) => {
+                    const logs = [];
+                    snapshot.forEach((child) => {
+                        logs.unshift(child.val()); // Mais recentes primeiro
+                    });
+                    renderizarLogs(logs);
+                });
+            } else {
+                const logs = JSON.parse(localStorage.getItem('larissa_logs') || '[]');
+                renderizarLogs(logs.slice(0, 20));
+            }
+        }
+
+        function renderizarLogs(logs) {
+            const container = document.getElementById('logsLista');
+            
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 20px;">Nenhum registro encontrado</div>';
+                return;
+            }
+
+            container.innerHTML = logs.map(log => {
+                const data = new Date(log.data);
+                const dataStr = data.toLocaleString('pt-BR');
+                const icone = log.tipo === 'sucesso' ? '✅' : '❌';
+                
+                return `
+                    <div class="log-item ${log.tipo}">
+                        <div>
+                            <div>${icone} ${log.acao}</div>
+                            <div class="log-data">${dataStr}</div>
+                        </div>
+                        <span class="log-ip">${log.sessionId ? log.sessionId.substring(0, 8) : '---'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function limparLogs() {
+            if (!confirm('Tem certeza que deseja apagar todo o histórico de logs?')) return;
+            
+            if (usandoFirebase) {
+                try {
+                    await db.ref('logs').remove();
+                } catch (e) {
+                    alert('Erro ao limpar logs: ' + e.message);
+                }
+            } else {
+                localStorage.removeItem('larissa_logs');
+                renderizarLogs([]);
+            }
+        }
+
+        // ==================== CONTROLE DO LANÇAMENTO ====================
+
+        async function salvarConfig(config) {
+            if (usandoFirebase) {
+                try {
+                    await db.ref('lancamento').set(config);
+                    await registrarLog('sucesso', `Configuração atualizada: ${JSON.stringify(config)}`);
+                } catch (e) {
+                    console.error("Erro Firebase:", e);
+                    alert("Erro ao salvar no Firebase: " + e.message);
+                }
+            } else {
+                localStorage.setItem('larissa_lancamento_config', JSON.stringify(config));
+                await registrarLog('sucesso', 'Configuração local atualizada');
+            }
             atualizarStatus();
         }
 
+        async function getConfig() {
+            if (usandoFirebase) {
+                try {
+                    const snapshot = await db.ref('lancamento').once('value');
+                    return snapshot.val() || { liberado: false, dataLancamento: null };
+                } catch (e) {
+                    console.error("Erro ao ler Firebase:", e);
+                    return { liberado: false, dataLancamento: null };
+                }
+            } else {
+                const salvo = localStorage.getItem('larissa_lancamento_config');
+                return salvo ? JSON.parse(salvo) : { liberado: false, dataLancamento: null };
+            }
+        }
+
         function atualizarStatus() {
-            const config = getConfig();
+            // Listener já cuida disso em tempo real para Firebase
+            if (!usandoFirebase) {
+                atualizarStatusLocal();
+            }
+        }
+
+        async function atualizarStatusLocal() {
+            const config = await getConfig();
             const agora = new Date().getTime();
             const statusEl = document.getElementById('statusText');
             const previewEl = document.getElementById('contadorPreview');
@@ -587,16 +848,16 @@
                     statusEl.className = 'status-valor status-liberado';
                     previewEl.style.display = 'none';
                 } else {
-                    statusEl.textContent = '🟡 AGENDADO (Contando...)';
+                    statusEl.textContent = '🟡 AGENDADO';
                     statusEl.className = 'status-valor status-agendado';
                     previewEl.style.display = 'flex';
                     
-                    const atualizarContador = () => {
+                    const atualizar = () => {
                         const atual = new Date().getTime();
                         const dist = config.dataLancamento - atual;
                         
                         if (dist <= 0) {
-                            atualizarStatus();
+                            atualizarStatusLocal();
                             return;
                         }
                         
@@ -611,8 +872,8 @@
                         document.getElementById('prevSeg').textContent = String(s).padStart(2, '0');
                     };
                     
-                    atualizarContador();
-                    updateInterval = setInterval(atualizarContador, 1000);
+                    atualizar();
+                    updateInterval = setInterval(atualizar, 1000);
                 }
             } 
             else {
@@ -622,15 +883,15 @@
             }
         }
 
-        function liberarAgora() {
-            salvarConfig({ liberado: true, dataLancamento: null });
-            alert('✅ Acesso liberado! A página da Larissa está disponível imediatamente.');
+        async function liberarAgora() {
+            await salvarConfig({ liberado: true, dataLancamento: null });
+            alert('✅ Acesso liberado para todos os dispositivos!');
         }
 
-        function agendarLancamento() {
+        async function agendarLancamento() {
             const input = document.getElementById('dataLancamento').value;
             if (!input) {
-                alert('⚠️ Selecione uma data e hora primeiro!');
+                alert('⚠️ Selecione uma data e hora!');
                 return;
             }
             
@@ -642,35 +903,92 @@
                 return;
             }
             
-            salvarConfig({ liberado: false, dataLancamento: timestamp });
+            await salvarConfig({ liberado: false, dataLancamento: timestamp });
             alert('✅ Lançamento agendado para:\n' + new Date(timestamp).toLocaleString('pt-BR'));
         }
 
-        function bloquearTudo() {
-            if (confirm('🔒 Tem certeza que deseja bloquear o acesso? A Larissa verá a tela de "Em Breve" novamente.')) {
-                salvarConfig({ liberado: false, dataLancamento: null });
-                alert('🔒 Acesso bloqueado.');
+        async function bloquearTudo() {
+            if (confirm('🔒 Bloquear acesso? Todos os dispositivos verão "Em Breve".')) {
+                await salvarConfig({ liberado: false, dataLancamento: null });
+                alert('🔒 Acesso bloqueado globalmente.');
             }
         }
 
-        function limparAgendamento() {
-            const config = getConfig();
-            salvarConfig({ ...config, dataLancamento: null });
+        async function limparAgendamento() {
+            const config = await getConfig();
+            await salvarConfig({ ...config, dataLancamento: null });
             document.getElementById('dataLancamento').value = '';
-            alert('🗑️ Data limpa. A página ficará em "Em Breve" até nova liberação.');
+            alert('🗑️ Data removida.');
         }
 
-        // Inicializar
+        function inicializarPainel() {
+            // Iniciar listener em tempo real do Firebase
+            if (usandoFirebase) {
+                db.ref('lancamento').on('value', (snapshot) => {
+                    const config = snapshot.val() || { liberado: false, dataLancamento: null };
+                    const agora = new Date().getTime();
+                    const statusEl = document.getElementById('statusText');
+                    const previewEl = document.getElementById('contadorPreview');
+
+                    if (updateInterval) clearInterval(updateInterval);
+
+                    if (config.liberado || (config.dataLancamento && agora >= config.dataLancamento)) {
+                        statusEl.textContent = '🟢 LIBERADO';
+                        statusEl.className = 'status-valor status-liberado';
+                        previewEl.style.display = 'none';
+                    } else if (config.dataLancamento) {
+                        statusEl.textContent = '🟡 AGENDADO';
+                        statusEl.className = 'status-valor status-agendado';
+                        previewEl.style.display = 'flex';
+                        
+                        const atualizar = () => {
+                            const atual = new Date().getTime();
+                            const dist = config.dataLancamento - atual;
+                            if (dist <= 0) return;
+                            
+                            const d = Math.floor(dist / (1000 * 60 * 60 * 24));
+                            const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+                            const s = Math.floor((dist % (1000 * 60)) / 1000);
+                            
+                            document.getElementById('prevDias').textContent = String(d).padStart(2, '0');
+                            document.getElementById('prevHoras').textContent = String(h).padStart(2, '0');
+                            document.getElementById('prevMin').textContent = String(m).padStart(2, '0');
+                            document.getElementById('prevSeg').textContent = String(s).padStart(2, '0');
+                        };
+                        
+                        atualizar();
+                        updateInterval = setInterval(atualizar, 1000);
+                    } else {
+                        statusEl.textContent = '🔴 BLOQUEADO';
+                        statusEl.className = 'status-valor status-bloqueado';
+                        previewEl.style.display = 'none';
+                    }
+                });
+            } else {
+                atualizarStatusLocal();
+            }
+
+            carregarLogs();
+        }
+
+        // Event Listeners
+        document.getElementById('inputSenhaAdmin')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verificarSenha();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             verificarSessao();
             
-            // Configurar input de data mínima
             const agora = new Date();
             agora.setHours(agora.getHours() + 1);
             agora.setMinutes(0);
             const dataMin = agora.toISOString().slice(0, 16);
             const inputData = document.getElementById('dataLancamento');
-            if (inputData) inputData.min = dataMin;
+            if (inputData) {
+                inputData.min = dataMin;
+                inputData.value = dataMin;
+            }
         });
     </script>
 
