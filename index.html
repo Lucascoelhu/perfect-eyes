@@ -30,14 +30,151 @@
             scroll-behavior: smooth;
         }
 
-        /* --- TELA DE ACESSO --- */
+        /* --- TELA DE SUSPENSE (LANÇAMENTO) --- */
+        #tela-suspense {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: opacity 1.5s ease-in-out, visibility 1.5s;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .suspense-elefante {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.6));
+            animation: pulseSuspense 2s ease-in-out infinite, floatSuspense 3s ease-in-out infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes pulseSuspense {
+            0%, 100% { filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.6)) brightness(1); }
+            50% { filter: drop-shadow(0 0 60px rgba(212, 175, 55, 0.9)) brightness(1.2); }
+        }
+
+        @keyframes floatSuspense {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .suspense-titulo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #d4af37 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+            background-size: 200% auto;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            50% { background-position: 200% center; }
+            100% { background-position: 0% center; }
+        }
+
+        .suspense-subtitulo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 50px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+
+        /* CONTADOR REGRESSIVO */
+        .contador-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .contador-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 20px 25px;
+            min-width: 80px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .contador-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.8);
+        }
+
+        .contador-numero {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #d4af37;
+            display: block;
+            line-height: 1;
+        }
+
+        .contador-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .suspense-mensagem {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            opacity: 0.6;
+            max-width: 400px;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        .suspense-loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 30px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- TELA DE ACESSO (SENHA) --- */
         #bloqueio {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 50%, #a29bfe 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
-            display: flex;
+            display: none; /* Inicialmente escondido */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -48,10 +185,8 @@
             backdrop-filter: blur(10px);
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        #bloqueio.visivel {
+            display: flex;
         }
 
         /* ELEFANTE NA TELA DE BLOQUEIO - ANTES DA SENHA */
@@ -254,10 +389,7 @@
         .container-carta::before {
             content: '';
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
             border: 1px solid rgba(155, 124, 182, 0.2);
             pointer-events: none;
             border-radius: 2px;
@@ -321,10 +453,8 @@
         .destaque::after {
             content: '';
             position: absolute;
-            bottom: 2px;
-            left: 0;
-            width: 100%;
-            height: 6px;
+            bottom: 2px; left: 0;
+            width: 100%; height: 6px;
             background: rgba(212, 175, 55, 0.3);
             z-index: -1;
             transform: scaleX(0);
@@ -627,10 +757,7 @@
             animation: flutuar linear infinite;
         }
 
-        .petala {
-            color: rgba(155, 124, 182, 0.4);
-        }
-
+        .petala { color: rgba(155, 124, 182, 0.4); }
         .estrela {
             color: rgba(212, 175, 55, 0.6);
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
@@ -686,9 +813,7 @@
                 opacity: 0;
                 transform: translateY(0) rotate(0deg) scale(0.5);
             }
-            20% {
-                opacity: 0.8;
-            }
+            20% { opacity: 0.8; }
             100% { 
                 opacity: 0;
                 transform: translateY(-150px) rotate(30deg) scale(1.2);
@@ -697,15 +822,14 @@
 
         /* --- RESPONSIVO --- */
         @media (max-width: 768px) {
-            .elefante-bloqueio {
-                width: 100px;
-                height: 100px;
-            }
+            .suspense-titulo { font-size: 2.5rem; }
+            .contador-numero { font-size: 1.8rem; }
+            .contador-item { padding: 15px 18px; min-width: 65px; }
+            .suspense-elefante { width: 120px; height: 120px; }
+            
+            .elefante-bloqueio { width: 100px; height: 100px; }
             .titulo-login { font-size: 2.5rem; }
-            .elefante-principal {
-                width: 80px;
-                height: 80px;
-            }
+            .elefante-principal { width: 80px; height: 80px; }
             .titulo-principal { font-size: 3rem; }
             .container-carta { 
                 padding: 40px 30px; 
@@ -724,9 +848,7 @@
                 bottom: 160px;
                 max-width: 250px;
             }
-            .musica-info {
-                display: none;
-            }
+            .musica-info { display: none; }
         }
 
         /* --- SCROLLBAR --- */
@@ -784,9 +906,42 @@
         </div>
     </div>
 
-    <!-- TELA DE BLOQUEIO - ELEFANTE ANTES DA SENHA -->
+    <!-- 🎭 TELA DE SUSPENSE (LANÇAMENTO) -->
+    <div id="tela-suspense">
+        <img src="Elefante.png" alt="🐘" class="suspense-elefante" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%22100%22%3E🐘%3C/text%3E%3C/svg%3E'">
+        
+        <h1 class="suspense-titulo">Em Breve</h1>
+        <p class="suspense-subtitulo">Algo especial está chegando</p>
+        
+        <!-- CONTADOR REGRESSIVO -->
+        <div class="contador-container" id="contador">
+            <div class="contador-item">
+                <span class="contador-numero" id="dias">00</span>
+                <span class="contador-label">Dias</span>
+            </div>
+            <div class="contador-item">
+                <span class="contador-numero" id="horas">00</span>
+                <span class="contador-label">Horas</span>
+            </div>
+            <div class="contador-item">
+                <span class="contador-numero" id="minutos">00</span>
+                <span class="contador-label">Minutos</span>
+            </div>
+            <div class="contador-item">
+                <span class="contador-numero" id="segundos">00</span>
+                <span class="contador-label">Segundos</span>
+            </div>
+        </div>
+        
+        <div class="suspense-loader"></div>
+        
+        <p class="suspense-mensagem">
+            "A espera torna o encontro ainda mais mágico..."
+        </p>
+    </div>
+
+    <!-- TELA DE BLOQUEIO (SENHA) - Inicialmente escondida -->
     <div id="bloqueio">
-        <!-- ELEFANTE GRANDE E CENTRALIZADO -->
         <img src="Elefante.png" alt="🐘 Elefante" class="elefante-bloqueio" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2280%22%3E🐘%3C/text%3E%3C/svg%3E'; this.className='elefante-bloqueio'">
         
         <h2 class="titulo-login">Para Larissa</h2>
@@ -795,10 +950,9 @@
         <input type="password" id="senha" class="input-senha" maxlength="4" placeholder="••••" autofocus>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL - ELEFANTE NO CENTRO EM CIMA -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo">
         
-        <!-- ELEFANTE NO CENTRO EM CIMA -->
         <div class="elefante-principal-container">
             <img src="Elefante.png" alt="🐘 Elefante" class="elefante-principal" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2260%22%3E🐘%3C/text%3E%3C/svg%3E'; this.className='elefante-principal'">
             
@@ -809,9 +963,7 @@
         <div class="container-carta">
             <img src="Olhos.jpg" alt="Meu desenho para você" class="desenho-fisico" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22 font-family=%22sans-serif%22%3ESeu desenho aqui%3C/text%3E%3C/svg%3E'">
 
-            <div class="paragrafo">
-                Por onde começo?
-            </div>
+            <div class="paragrafo">Por onde começo?</div>
 
             <div class="paragrafo">
                 Antes de tudo, saiba que este desenho é apenas uma tentativa humilde de capturar a <span class="destaque">beleza etérea</span> que seus olhos carregam. Para quem deseja verdadeiramente compreendê-la, seria necessário vê-los pessoalmente — encantar-se-iam com esse espetáculo único.
@@ -821,9 +973,7 @@
                 Minha vida, devo confessar, sempre fluiu em tons de cinza. Não vivi grandes aventuras nem busquei emoções fortes. Preferia a quietude, a rotina serena. Para muitos, isso significa "não aproveitar a vida". Talvez tenham razão, mas eu estava contente assim — vivendo do meu jeito.
             </div>
 
-            <div class="paragrafo">
-                ...Até que te vi pela primeira vez.
-            </div>
+            <div class="paragrafo">...Até que te vi pela primeira vez.</div>
 
             <div class="paragrafo">
                 Foi como se alguém tivesse abruptamente aberto as cortinas de uma sala escura. Uma <span class="destaque">presença luminosa</span> que preencheu todo o espaço. Sua beleza não passou despercebida — ascendeu, iluminou, transformou a atmosfera daquela loja comum em algo mágico.
@@ -837,8 +987,7 @@
                 Não há memória sensorial mais vívida do que o <span class="destaque">perfume da sua pele</span>. Macia, quente, impossível de esquecer. É naquele aroma que encontrei paz — uma sensação de pertencimento que não sei explicar, apenas sentir.
             </div>
 
-            <div class="paragrafo">
-            </div>
+            <div class="paragrafo"></div>
 
             <div class="citacao">
                 "Será que ser bom demais com alguém nos torna ruins para elas?"
@@ -880,6 +1029,117 @@
     </div>
 
     <script>
+        // ==================== SISTEMA DE LANÇAMENTO ====================
+        
+        // Configuração do lançamento (pode ser alterada via localStorage pelo admin)
+        const CONFIG_KEY = 'larissa_lancamento_config';
+        
+        function getLancamentoConfig() {
+            const padrao = {
+                liberado: false,
+                dataLancamento: null // null = aguardando liberação manual
+            };
+            
+            const salvo = localStorage.getItem(CONFIG_KEY);
+            if (salvo) {
+                return { ...padrao, ...JSON.parse(salvo) };
+            }
+            return padrao;
+        }
+        
+        function salvarConfig(config) {
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+        }
+        
+        // Verificar liberação
+        function verificarLiberacao() {
+            const config = getLancamentoConfig();
+            const agora = new Date().getTime();
+            
+            // Se já está liberado manualmente
+            if (config.liberado) {
+                return true;
+            }
+            
+            // Se tem data de lançamento definida
+            if (config.dataLancamento) {
+                return agora >= config.dataLancamento;
+            }
+            
+            return false;
+        }
+        
+        // Contador regressivo
+        let contadorInterval;
+        
+        function iniciarContador() {
+            const config = getLancamentoConfig();
+            
+            // Se não tem data definida, mostrar mensagem de "em breve" sem contador específico
+            if (!config.dataLancamento && !config.liberado) {
+                document.getElementById('dias').textContent = '--';
+                document.getElementById('horas').textContent = '--';
+                document.getElementById('minutos').textContent = '--';
+                document.getElementById('segundos').textContent = '--';
+                return;
+            }
+            
+            function atualizar() {
+                if (verificarLiberacao()) {
+                    liberarAcesso();
+                    return;
+                }
+                
+                const agora = new Date().getTime();
+                const distancia = config.dataLancamento - agora;
+                
+                const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
+                const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+                
+                document.getElementById('dias').textContent = String(dias).padStart(2, '0');
+                document.getElementById('horas').textContent = String(horas).padStart(2, '0');
+                document.getElementById('minutos').textContent = String(minutos).padStart(2, '0');
+                document.getElementById('segundos').textContent = String(segundos).padStart(2, '0');
+            }
+            
+            atualizar();
+            contadorInterval = setInterval(atualizar, 1000);
+        }
+        
+        // Liberar acesso (transição para tela de senha)
+        function liberarAcesso() {
+            clearInterval(contadorInterval);
+            
+            const telaSuspense = document.getElementById('tela-suspense');
+            const bloqueio = document.getElementById('bloqueio');
+            
+            // Animação de saída
+            telaSuspense.style.opacity = '0';
+            telaSuspense.style.visibility = 'hidden';
+            
+            setTimeout(() => {
+                telaSuspense.style.display = 'none';
+                bloqueio.classList.add('visivel');
+                document.getElementById('senha').focus();
+            }, 1500);
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            if (verificarLiberacao()) {
+                // Já liberado, ir direto para senha
+                document.getElementById('tela-suspense').style.display = 'none';
+                document.getElementById('bloqueio').classList.add('visivel');
+            } else {
+                // Mostrar suspense com contador
+                iniciarContador();
+            }
+        });
+
+        // ==================== SISTEMA ORIGINAL (INALTERADO) ====================
+
         // Playlist de músicas
         const playlist = [
             {
