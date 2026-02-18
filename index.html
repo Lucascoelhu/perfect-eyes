@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <style>
+        /* ... (mantenha TODO o CSS anterior igual) ... */
         :root {
             --lavanda-claro: #f8f4fc;
             --lavanda-medio: #d4c4e0;
@@ -1095,8 +1096,27 @@
 
         // Obter informações do dispositivo
         function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let navegador = 'Desconhecido';
+            let os = 'Desconhecido';
+            
+            // Detectar navegador
+            if (ua.indexOf("Chrome") > -1) navegador = "Chrome";
+            else if (ua.indexOf("Safari") > -1) navegador = "Safari";
+            else if (ua.indexOf("Firefox") > -1) navegador = "Firefox";
+            else if (ua.indexOf("Edge") > -1) navegador = "Edge";
+            
+            // Detectar SO
+            if (ua.indexOf("Win") > -1) os = "Windows";
+            else if (ua.indexOf("Mac") > -1) os = "MacOS";
+            else if (ua.indexOf("Linux") > -1) os = "Linux";
+            else if (ua.indexOf("Android") > -1) os = "Android";
+            else if (ua.indexOf("iOS") > -1 || ua.indexOf("iPhone") > -1 || ua.indexOf("iPad") > -1) os = "iOS";
+
             return {
-                userAgent: navigator.userAgent,
+                userAgent: ua.substring(0, 150),
+                navegador: navegador,
+                os: os,
                 plataforma: navigator.platform,
                 linguagem: navigator.language,
                 tela: `${window.screen.width}x${window.screen.height}`,
@@ -1108,7 +1128,7 @@
             };
         }
 
-        // Obter localização aproximada (via API gratuita ou geolocation)
+        // Obter localização aproximada
         async function getLocationInfo() {
             const info = {
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -1156,20 +1176,19 @@
                 localizacao: locationInfo,
                 url: window.location.href,
                 referrer: document.referrer || 'direto',
-                fase: 'suspense', // suspense, senha, ou conteudo
+                fase: 'suspense',
                 acessouConteudo: false,
                 tempoTotal: 0
             };
 
             try {
-                // Salvar na sessão local para atualizações
                 sessionStorage.setItem(TRACKING_KEY, sessionId);
                 
                 // Salvar no Firebase
                 const novaVisita = await db.ref('acessos').push(visita);
                 console.log("✅ Visita registrada:", novaVisita.key);
                 
-                // Atualizar status online do visitante
+                // Atualizar status online
                 db.ref(`online/${sessionId}`).set({
                     timestamp: Date.now(),
                     fase: 'suspense'
@@ -1202,7 +1221,6 @@
             }
 
             try {
-                // Encontrar e atualizar registro desta sessão
                 const snapshot = await db.ref('acessos')
                     .orderByChild('sessionId')
                     .equalTo(sessionId)
@@ -1213,7 +1231,6 @@
                     db.ref(`acessos/${child.key}`).update(update);
                 });
 
-                // Atualizar status online
                 db.ref(`online/${sessionId}`).update({
                     timestamp: Date.now(),
                     fase: novaFase
@@ -1228,7 +1245,7 @@
         async function atualizarTempoTotal() {
             if (!usandoFirebase || !sessionId) return;
             
-            const tempoTotal = Math.floor((Date.now() - tempoInicio) / 1000); // segundos
+            const tempoTotal = Math.floor((Date.now() - tempoInicio) / 1000);
             
             try {
                 const snapshot = await db.ref('acessos')
@@ -1248,12 +1265,12 @@
             }
         }
 
-        // Registrar cliques e interações
+        // Registrar interações
         function registrarInteracao(tipo, detalhes = {}) {
             if (!usandoFirebase || !sessionId) return;
 
             const interacao = {
-                tipo: tipo, // 'click', 'scroll', 'musica_play', etc
+                tipo: tipo,
                 sessionId: sessionId,
                 timestamp: Date.now(),
                 detalhes: detalhes
@@ -1386,14 +1403,12 @@
                 bloqueio.classList.add('visivel');
                 document.getElementById('senha').focus();
                 
-                // Registrar que chegou à tela de senha
                 atualizarProgresso('senha');
             }, 1500);
         }
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', async () => {
-            // Registrar visita assim que carregar
             await registrarVisita();
             
             const config = await getConfig();
@@ -1533,7 +1548,6 @@
                 inputSenha.style.borderColor = "#4ecdc4";
                 inputSenha.style.boxShadow = "0 0 30px rgba(78, 205, 196, 0.5)";
                 
-                // Registrar acesso ao conteúdo!
                 atualizarProgresso('conteudo', { senhaCorreta: true });
                 registrarInteracao('senha_correta');
                 
