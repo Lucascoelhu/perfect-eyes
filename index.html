@@ -936,8 +936,8 @@
     <div id="tela-suspense">
         <img src="Elefante.png" alt="🐘" class="suspense-elefante" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%22100%22%3E🐘%3C/text%3E%3C/svg%3E'">
         
-        <h1 class="suspense-titulo">Aguarde...</h1>
-        <p class="suspense-subtitulo">Ao chegar "00-00-00-00",<br> <br> terá acesso à essa carta.<br> </p>
+        <h1 class="suspense-titulo">Em Breve</h1>
+        <p class="suspense-subtitulo">Algo especial está chegando</p>
         
         <!-- CONTADOR REGRESSIVO -->
         <div class="contador-container" id="contador">
@@ -1061,7 +1061,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAxb-5M3to-4ahXkwcVSn-rVl4vFn-ZYs4",
             authDomain: "manu-d68f4.firebaseapp.com",
-            databaseURL: "https://manu-d68f4-default-rtdb.firebaseio.com", // ← ADICIONE ESTA LINHA!
+            databaseURL: "https://manu-d68f4-default-rtdb.firebaseio.com",
             projectId: "manu-d68f4",
             storageBucket: "manu-d68f4.firebasestorage.app",
             messagingSenderId: "224631826772",
@@ -1078,8 +1078,188 @@
             usandoFirebase = true;
             console.log("✅ Firebase conectado");
         } catch (e) {
-            console.log("⚠️ Firebase não disponível, usando localStorage");
+            console.log("⚠️ Firebase não disponível:", e);
             document.getElementById('statusOffline').classList.add('visivel');
+        }
+
+        // ==================== SISTEMA DE RASTREAMENTO (TRACKING) ====================
+        
+        const TRACKING_KEY = 'larissa_visitante_atual';
+        let sessionId = null;
+        let tempoInicio = Date.now();
+
+        // Gerar ID único para esta sessão
+        function gerarSessionId() {
+            return 'sess_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+        }
+
+        // Obter informações do dispositivo
+        function getDeviceInfo() {
+            return {
+                userAgent: navigator.userAgent,
+                plataforma: navigator.platform,
+                linguagem: navigator.language,
+                tela: `${window.screen.width}x${window.screen.height}`,
+                nucleos: navigator.hardwareConcurrency || 'desconhecido',
+                memoria: navigator.deviceMemory || 'desconhecido',
+                online: navigator.onLine,
+                touch: 'ontouchstart' in window,
+                cookies: navigator.cookieEnabled
+            };
+        }
+
+        // Obter localização aproximada (via API gratuita ou geolocation)
+        async function getLocationInfo() {
+            const info = {
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timestamp: Date.now()
+            };
+
+            // Tentar geolocation do navegador (se permitido)
+            if (navigator.geolocation) {
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, {
+                            timeout: 5000,
+                            enableHighAccuracy: false
+                        });
+                    });
+                    info.latitude = position.coords.latitude;
+                    info.longitude = position.coords.longitude;
+                    info.accuracy = position.coords.accuracy;
+                    info.fonte = 'gps';
+                } catch (e) {
+                    info.fonte = 'timezone_aproximado';
+                }
+            }
+
+            return info;
+        }
+
+        // Registrar visita no Firebase
+        async function registrarVisita() {
+            if (!usandoFirebase) {
+                console.log("Tracking desativado - sem Firebase");
+                return;
+            }
+
+            sessionId = gerarSessionId();
+            const deviceInfo = getDeviceInfo();
+            const locationInfo = await getLocationInfo();
+
+            const visita = {
+                tipo: 'visita',
+                sessionId: sessionId,
+                timestamp: Date.now(),
+                data: new Date().toISOString(),
+                dispositivo: deviceInfo,
+                localizacao: locationInfo,
+                url: window.location.href,
+                referrer: document.referrer || 'direto',
+                fase: 'suspense', // suspense, senha, ou conteudo
+                acessouConteudo: false,
+                tempoTotal: 0
+            };
+
+            try {
+                // Salvar na sessão local para atualizações
+                sessionStorage.setItem(TRACKING_KEY, sessionId);
+                
+                // Salvar no Firebase
+                const novaVisita = await db.ref('acessos').push(visita);
+                console.log("✅ Visita registrada:", novaVisita.key);
+                
+                // Atualizar status online do visitante
+                db.ref(`online/${sessionId}`).set({
+                    timestamp: Date.now(),
+                    fase: 'suspense'
+                });
+                
+                // Remover quando sair
+                window.addEventListener('beforeunload', () => {
+                    db.ref(`online/${sessionId}`).remove();
+                    atualizarTempoTotal();
+                });
+                
+            } catch (e) {
+                console.error("Erro ao registrar visita:", e);
+            }
+        }
+
+        // Atualizar progresso do visitante
+        async function atualizarProgresso(novaFase, dadosExtras = {}) {
+            if (!usandoFirebase || !sessionId) return;
+
+            const update = {
+                fase: novaFase,
+                ultimaAtualizacao: Date.now(),
+                ...dadosExtras
+            };
+
+            if (novaFase === 'conteudo') {
+                update.acessouConteudo = true;
+                update.horaAcessoConteudo = Date.now();
+            }
+
+            try {
+                // Encontrar e atualizar registro desta sessão
+                const snapshot = await db.ref('acessos')
+                    .orderByChild('sessionId')
+                    .equalTo(sessionId)
+                    .limitToLast(1)
+                    .once('value');
+                
+                snapshot.forEach((child) => {
+                    db.ref(`acessos/${child.key}`).update(update);
+                });
+
+                // Atualizar status online
+                db.ref(`online/${sessionId}`).update({
+                    timestamp: Date.now(),
+                    fase: novaFase
+                });
+                
+            } catch (e) {
+                console.error("Erro ao atualizar progresso:", e);
+            }
+        }
+
+        // Atualizar tempo total na página
+        async function atualizarTempoTotal() {
+            if (!usandoFirebase || !sessionId) return;
+            
+            const tempoTotal = Math.floor((Date.now() - tempoInicio) / 1000); // segundos
+            
+            try {
+                const snapshot = await db.ref('acessos')
+                    .orderByChild('sessionId')
+                    .equalTo(sessionId)
+                    .limitToLast(1)
+                    .once('value');
+                
+                snapshot.forEach((child) => {
+                    db.ref(`acessos/${child.key}`).update({
+                        tempoTotal: tempoTotal,
+                        dataSaida: new Date().toISOString()
+                    });
+                });
+            } catch (e) {
+                console.error("Erro ao atualizar tempo:", e);
+            }
+        }
+
+        // Registrar cliques e interações
+        function registrarInteracao(tipo, detalhes = {}) {
+            if (!usandoFirebase || !sessionId) return;
+
+            const interacao = {
+                tipo: tipo, // 'click', 'scroll', 'musica_play', etc
+                sessionId: sessionId,
+                timestamp: Date.now(),
+                detalhes: detalhes
+            };
+
+            db.ref('interacoes').push(interacao).catch(e => console.error(e));
         }
 
         // ==================== SISTEMA DE LANÇAMENTO ====================
@@ -1088,18 +1268,12 @@
         let contadorInterval;
         let unsubscribeFirebase = null;
 
-        // Fallback para localStorage
         function getLocalConfig() {
             const padrao = { liberado: false, dataLancamento: null };
             const salvo = localStorage.getItem(CONFIG_KEY);
             return salvo ? { ...padrao, ...JSON.parse(salvo) } : padrao;
         }
 
-        function salvarLocalConfig(config) {
-            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-        }
-
-        // Obter configuração (Firebase ou local)
         async function getConfig() {
             if (!usandoFirebase) {
                 return getLocalConfig();
@@ -1122,7 +1296,6 @@
             }
         }
 
-        // Escutar mudanças em tempo real
         function iniciarListener() {
             if (!usandoFirebase) return;
 
@@ -1140,11 +1313,9 @@
         function verificarStatusEAtualizar(config) {
             const agora = new Date().getTime();
             
-            // Verificar se deve liberar
             if (config.liberado || (config.dataLancamento && agora >= config.dataLancamento)) {
                 liberarAcesso();
             } else {
-                // Atualizar contador visual
                 if (config.dataLancamento) {
                     atualizarContadorVisual(config.dataLancamento);
                 }
@@ -1199,20 +1370,14 @@
             contadorInterval = setInterval(atualizar, 1000);
         }
 
-        // Liberar acesso (transição para tela de senha)
         function liberarAcesso() {
             if (contadorInterval) clearInterval(contadorInterval);
-            if (unsubscribeFirebase) {
-                // Manter listener ativo para mudanças futuras
-            }
 
             const telaSuspense = document.getElementById('tela-suspense');
             const bloqueio = document.getElementById('bloqueio');
 
-            // Verificar se já não está liberado
             if (bloqueio.classList.contains('visivel')) return;
 
-            // Animação de saída
             telaSuspense.style.opacity = '0';
             telaSuspense.style.visibility = 'hidden';
 
@@ -1220,23 +1385,27 @@
                 telaSuspense.style.display = 'none';
                 bloqueio.classList.add('visivel');
                 document.getElementById('senha').focus();
+                
+                // Registrar que chegou à tela de senha
+                atualizarProgresso('senha');
             }, 1500);
         }
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', async () => {
+            // Registrar visita assim que carregar
+            await registrarVisita();
+            
             const config = await getConfig();
             
             if (config.liberado || (config.dataLancamento && new Date().getTime() >= config.dataLancamento)) {
-                // Já liberado, ir direto para senha
                 document.getElementById('tela-suspense').style.display = 'none';
                 document.getElementById('bloqueio').classList.add('visivel');
+                atualizarProgresso('senha');
             } else if (config.dataLancamento) {
-                // Tem data definida, iniciar contador
                 iniciarContadorLocal(config.dataLancamento);
-                iniciarListener(); // Escutar mudanças do admin
+                iniciarListener();
             } else {
-                // Sem data, mostrar "--" e aguardar
                 document.getElementById('dias').textContent = '--';
                 document.getElementById('horas').textContent = '--';
                 document.getElementById('minutos').textContent = '--';
@@ -1310,6 +1479,7 @@
             atualizarListaVisual();
             if (musicaTocando) {
                 musica.play();
+                registrarInteracao('musica_play', { musica: playlist[index].nome });
             }
         }
 
@@ -1328,6 +1498,7 @@
 
         function abrirSeletor() {
             seletorMusicas.classList.add('aberto');
+            registrarInteracao('abrir_seletor_musicas');
         }
 
         function fecharSeletor() {
@@ -1340,10 +1511,31 @@
             }
         });
 
+        // Rastrear cliques na página
+        document.addEventListener('click', (e) => {
+            const target = e.target.tagName;
+            const id = e.target.id || 'sem-id';
+            registrarInteracao('click', { elemento: target, id: id, classe: e.target.className });
+        });
+
+        // Rastrear scroll
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+                registrarInteracao('scroll', { porcentagem: scrollPercent });
+            }, 500);
+        });
+
         inputSenha.addEventListener('input', (e) => {
             if(inputSenha.value === "4691") {
                 inputSenha.style.borderColor = "#4ecdc4";
                 inputSenha.style.boxShadow = "0 0 30px rgba(78, 205, 196, 0.5)";
+                
+                // Registrar acesso ao conteúdo!
+                atualizarProgresso('conteudo', { senhaCorreta: true });
+                registrarInteracao('senha_correta');
                 
                 setTimeout(() => {
                     bloqueio.style.opacity = "0";
@@ -1367,6 +1559,13 @@
             }
         });
 
+        // Registrar tentativas de senha errada
+        inputSenha.addEventListener('blur', () => {
+            if (inputSenha.value.length === 4 && inputSenha.value !== "4691") {
+                registrarInteracao('senha_errada', { tentativa: inputSenha.value });
+            }
+        });
+
         function mostrarControlesMusica() {
             setTimeout(() => {
                 controleMusica.classList.add('visivel');
@@ -1378,6 +1577,7 @@
                 musicaTocando = true;
                 atualizarEstadoMusica();
                 iniciarNotasMusicais();
+                registrarInteracao('musica_autoplay');
             }).catch(() => {
                 console.log("Autoplay bloqueado");
             });
@@ -1388,10 +1588,12 @@
                 musica.pause();
                 musicaTocando = false;
                 clearInterval(notasInterval);
+                registrarInteracao('musica_pause');
             } else {
                 musica.play();
                 musicaTocando = true;
                 iniciarNotasMusicais();
+                registrarInteracao('musica_play_manual');
             }
             atualizarEstadoMusica();
         }
