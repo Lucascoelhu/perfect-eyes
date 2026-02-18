@@ -174,7 +174,7 @@
         #painel-admin {
             display: none;
             width: 100%;
-            max-width: 900px;
+            max-width: 1200px;
             animation: fadeIn 0.8s ease;
         }
 
@@ -257,6 +257,42 @@
             letter-spacing: 2px;
         }
 
+        /* ESTATÍSTICAS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .stat-numero {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #d4af37;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -265,6 +301,7 @@
 
         @media (max-width: 768px) {
             .grid-2 { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         .status-box {
@@ -423,8 +460,8 @@
             margin-top: 5px;
         }
 
-        /* LOGS DE ACESSO */
-        .logs-section {
+        /* SEÇÃO DE ACESSOS */
+        .acessos-section {
             margin-top: 30px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 15px;
@@ -432,60 +469,132 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .logs-titulo {
-            font-size: 1rem;
-            margin-bottom: 15px;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-titulo {
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .logs-lista {
-            max-height: 200px;
-            overflow-y: auto;
-            font-size: 0.8rem;
+        .filtros {
+            display: flex;
+            gap: 10px;
         }
 
-        .log-item {
-            padding: 10px;
-            margin-bottom: 8px;
+        .btn-filtro {
+            padding: 8px 15px;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filtro.ativo {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: #d4af37;
+        }
+
+        .acessos-lista {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .acesso-item {
+            padding: 15px;
+            margin-bottom: 10px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-radius: 10px;
             border-left: 3px solid transparent;
             transition: all 0.3s ease;
         }
 
-        .log-item:hover {
+        .acesso-item:hover {
             background: rgba(255, 255, 255, 0.1);
             transform: translateX(5px);
         }
 
-        .log-item.sucesso { border-left-color: #4ecdc4; }
-        .log-item.falha { border-left-color: #ff6b6b; }
-
-        .log-data {
-            opacity: 0.6;
-            font-size: 0.75rem;
+        .acesso-item.online {
+            border-left-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
         }
 
-        .log-ip {
+        .acesso-item.conteudo {
+            border-left-color: #d4af37;
+        }
+
+        .acesso-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .acesso-id {
             font-family: monospace;
-            background: rgba(0,0,0,0.3);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
+            color: #d4af37;
         }
 
-        .btn-limpar-logs {
-            margin-top: 15px;
-            width: 100%;
-            padding: 10px;
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            color: #ff6b6b;
+        .acesso-status {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .acesso-status.online {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+        }
+
+        .acesso-status.conteudo {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+        }
+
+        .acesso-info {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+
+        .acesso-device {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        .acesso-tempo {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #4ecdc4;
+        }
+
+        .sem-dados {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.5;
+        }
+
+        .btn-atualizar {
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
@@ -493,7 +602,25 @@
             transition: all 0.3s ease;
         }
 
-        .btn-limpar-logs:hover {
+        .btn-atualizar:hover {
+            background: rgba(78, 205, 196, 0.3);
+        }
+
+        .btn-limpar-tudo {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn-limpar-tudo:hover {
             background: rgba(255, 107, 107, 0.3);
         }
 
@@ -506,6 +633,7 @@
             h1 { font-size: 2rem; }
             .botoes { flex-direction: column; }
             button { width: 100%; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -540,12 +668,32 @@
     <div id="painel-admin">
         <div class="container">
             <div class="header-painel">
-                <span class="status-conexão" id="statusConexao">🟡 Conectando...</span>
+                <span class="status-conexao" id="statusConexao">🟡 Conectando...</span>
                 <button class="btn-logout" onclick="fazerLogout()">🚪 Sair</button>
             </div>
             
             <h1>🐘 Painel de Controle</h1>
             <p class="subtitulo">Lançamento - Para Larissa</p>
+
+            <!-- ESTATÍSTICAS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-numero" id="statTotal">0</div>
+                    <div class="stat-label">Total de Acessos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-numero" id="statOnline">0</div>
+                    <div class="stat-label">Online Agora</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-numero" id="statConteudo">0</div>
+                    <div class="stat-label">Viram a Carta</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-numero" id="statHoje">0</div>
+                    <div class="stat-label">Acessos Hoje</div>
+                </div>
+            </div>
 
             <div class="grid-2">
                 <div>
@@ -597,17 +745,27 @@
                 </div>
 
                 <div>
-                    <div class="logs-section">
-                        <div class="logs-titulo">
-                            📋 Logs de Acesso
-                            <span style="font-size: 0.75rem; opacity: 0.6;">(últimos 20)</span>
-                        </div>
-                        <div class="logs-lista" id="logsLista">
-                            <div style="text-align: center; opacity: 0.5; padding: 20px;">
-                                Carregando logs...
+                    <!-- ACESSOS EM TEMPO REAL -->
+                    <div class="acessos-section">
+                        <div class="section-header">
+                            <div class="section-titulo">
+                                📊 Acessos em Tempo Real
+                                <span style="font-size: 0.75rem; opacity: 0.6;" id="contadorAcessos">(0)</span>
                             </div>
+                            <button class="btn-atualizar" onclick="carregarAcessos()">🔄 Atualizar</button>
                         </div>
-                        <button class="btn-limpar-logs" onclick="limparLogs()">🗑️ Limpar Histórico</button>
+                        
+                        <div class="filtros">
+                            <button class="btn-filtro ativo" onclick="filtrarAcessos('todos')">Todos</button>
+                            <button class="btn-filtro" onclick="filtrarAcessos('online')">Online</button>
+                            <button class="btn-filtro" onclick="filtrarAcessos('conteudo')">Viram Carta</button>
+                        </div>
+
+                        <div class="acessos-lista" id="acessosLista">
+                            <div class="sem-dados">Carregando acessos...</div>
+                        </div>
+                        
+                        <button class="btn-limpar-tudo" onclick="limparTodosAcessos()">🗑️ Limpar Todo Histórico</button>
                     </div>
                 </div>
             </div>
@@ -621,7 +779,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAxb-5M3to-4ahXkwcVSn-rVl4vFn-ZYs4",
             authDomain: "manu-d68f4.firebaseapp.com",
-            databaseURL: "https://manu-d68f4-default-rtdb.firebaseio.com", // ← ADICIONE ESTA LINHA!
+            databaseURL: "https://manu-d68f4-default-rtdb.firebaseio.com",
             projectId: "manu-d68f4",
             storageBucket: "manu-d68f4.firebasestorage.app",
             messagingSenderId: "224631826772",
@@ -647,10 +805,10 @@
 
         // ==================== SISTEMA DE LOGIN ====================
 
-        const SENHA_ADMIN = "coelhus";
+        const SENHA_ADMIN = "4691";
         const SESSION_KEY = 'larissa_admin_session';
         let updateInterval;
-        let logsListener = null;
+        let filtroAtual = 'todos';
 
         async function verificarSenha() {
             const input = document.getElementById('inputSenhaAdmin');
@@ -658,19 +816,14 @@
             const senhaDigitada = input.value;
 
             if (senhaDigitada === SENHA_ADMIN) {
-                // Registrar log de acesso bem-sucedido
                 await registrarLog('sucesso', 'Login administrativo');
-                
                 sessionStorage.setItem(SESSION_KEY, 'true');
                 mostrarPainel();
             } else {
-                // Registrar tentativa falha
                 await registrarLog('falha', 'Tentativa de acesso negada');
-                
                 input.classList.add('erro');
                 mensagemErro.classList.add('visivel');
                 input.value = '';
-                
                 setTimeout(() => {
                     input.classList.remove('erro');
                     mensagemErro.classList.remove('visivel');
@@ -705,87 +858,196 @@
             }
         }
 
-        // ==================== LOGS DE ACESSO ====================
+        // ==================== LOGS DE ADMIN ====================
 
         async function registrarLog(tipo, acao) {
-            const agora = new Date();
+            if (!usandoFirebase) return;
+            
             const log = {
-                tipo: tipo, // 'sucesso' ou 'falha'
+                tipo: tipo,
                 acao: acao,
-                data: agora.toISOString(),
-                timestamp: agora.getTime(),
-                userAgent: navigator.userAgent.substring(0, 100),
-                // Não temos IP real no cliente, mas podemos gerar um identificador
-                sessionId: Math.random().toString(36).substring(2, 15)
+                data: new Date().toISOString(),
+                timestamp: Date.now(),
+                userAgent: navigator.userAgent.substring(0, 100)
             };
 
-            if (usandoFirebase) {
-                try {
-                    await db.ref('logs').push(log);
-                } catch (e) {
-                    console.error("Erro ao salvar log:", e);
-                }
-            } else {
-                // Fallback local
-                const logs = JSON.parse(localStorage.getItem('larissa_logs') || '[]');
-                logs.unshift(log);
-                if (logs.length > 50) logs.pop(); // Manter apenas 50
-                localStorage.setItem('larissa_logs', JSON.stringify(logs));
+            try {
+                await db.ref('logs').push(log);
+            } catch (e) {
+                console.error("Erro ao salvar log:", e);
             }
         }
 
-        function carregarLogs() {
-            if (usandoFirebase) {
-                logsListener = db.ref('logs').orderByChild('timestamp').limitToLast(20).on('value', (snapshot) => {
-                    const logs = [];
-                    snapshot.forEach((child) => {
-                        logs.unshift(child.val()); // Mais recentes primeiro
-                    });
-                    renderizarLogs(logs);
-                });
-            } else {
-                const logs = JSON.parse(localStorage.getItem('larissa_logs') || '[]');
-                renderizarLogs(logs.slice(0, 20));
-            }
-        }
+        // ==================== ESTATÍSTICAS E ACESSOS ====================
 
-        function renderizarLogs(logs) {
-            const container = document.getElementById('logsLista');
+        function calcularEstatisticas(acessos) {
+            const agora = Date.now();
+            const inicioHoje = new Date().setHours(0, 0, 0, 0);
             
-            if (logs.length === 0) {
-                container.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 20px;">Nenhum registro encontrado</div>';
+            const stats = {
+                total: acessos.length,
+                online: 0,
+                conteudo: 0,
+                hoje: 0
+            };
+
+            acessos.forEach(a => {
+                if (a.timestamp > inicioHoje) stats.hoje++;
+                if (a.acessouConteudo) stats.conteudo++;
+            });
+
+            return stats;
+        }
+
+        async function carregarEstatisticas() {
+            if (!usandoFirebase) return;
+
+            try {
+                // Total de acessos
+                const snapshotAcessos = await db.ref('acessos').once('value');
+                const acessos = [];
+                snapshotAcessos.forEach(child => {
+                    acessos.push(child.val());
+                });
+
+                const stats = calcularEstatisticas(acessos);
+                
+                document.getElementById('statTotal').textContent = stats.total;
+                document.getElementById('statConteudo').textContent = stats.conteudo;
+                document.getElementById('statHoje').textContent = stats.hoje;
+
+                // Online agora
+                const snapshotOnline = await db.ref('online').once('value');
+                const onlineCount = snapshotOnline.numChildren();
+                document.getElementById('statOnline').textContent = onlineCount;
+
+            } catch (e) {
+                console.error("Erro ao carregar estatísticas:", e);
+            }
+        }
+
+        async function carregarAcessos() {
+            if (!usandoFirebase) {
+                document.getElementById('acessosLista').innerHTML = 
+                    '<div class="sem-dados">Firebase não disponível</div>';
                 return;
             }
 
-            container.innerHTML = logs.map(log => {
-                const data = new Date(log.data);
-                const dataStr = data.toLocaleString('pt-BR');
-                const icone = log.tipo === 'sucesso' ? '✅' : '❌';
+            try {
+                const snapshot = await db.ref('acessos')
+                    .orderByChild('timestamp')
+                    .limitToLast(50)
+                    .once('value');
+
+                const acessos = [];
+                snapshot.forEach(child => {
+                    acessos.unshift({ id: child.key, ...child.val() });
+                });
+
+                // Pegar quem está online
+                const snapshotOnline = await db.ref('online').once('value');
+                const onlineIds = {};
+                snapshotOnline.forEach(child => {
+                    onlineIds[child.key] = child.val();
+                });
+
+                renderizarAcessos(acessos, onlineIds);
+                atualizarContador(acessos.length);
+
+            } catch (e) {
+                console.error("Erro ao carregar acessos:", e);
+                document.getElementById('acessosLista').innerHTML = 
+                    '<div class="sem-dados">Erro ao carregar dados</div>';
+            }
+        }
+
+        function renderizarAcessos(acessos, onlineIds) {
+            const container = document.getElementById('acessosLista');
+            
+            const acessosFiltrados = acessos.filter(a => {
+                if (filtroAtual === 'online') return onlineIds[a.sessionId];
+                if (filtroAtual === 'conteudo') return a.acessouConteudo;
+                return true;
+            });
+
+            if (acessosFiltrados.length === 0) {
+                container.innerHTML = '<div class="sem-dados">Nenhum acesso encontrado</div>';
+                return;
+            }
+
+            container.innerHTML = acessosFiltrados.map(a => {
+                const isOnline = onlineIds[a.sessionId];
+                const status = isOnline ? 'online' : (a.acessouConteudo ? 'conteudo' : 'offline');
+                const statusText = isOnline ? '🟢 Online' : (a.acessouConteudo ? '⭐ Viu carta' : '⚪ Offline');
                 
+                const data = new Date(a.timestamp).toLocaleString('pt-BR');
+                const dispositivo = a.dispositivo || {};
+                const plataforma = dispositivo.plataforma || 'Desconhecido';
+                const tela = dispositivo.tela || '--';
+                
+                let tempoText = '';
+                if (a.tempoTotal) {
+                    const min = Math.floor(a.tempoTotal / 60);
+                    const seg = a.tempoTotal % 60;
+                    tempoText = `⏱️ ${min}min ${seg}s`;
+                }
+
                 return `
-                    <div class="log-item ${log.tipo}">
-                        <div>
-                            <div>${icone} ${log.acao}</div>
-                            <div class="log-data">${dataStr}</div>
+                    <div class="acesso-item ${status}">
+                        <div class="acesso-header">
+                            <span class="acesso-id">${a.sessionId ? a.sessionId.substring(0, 12) : '---'}...</span>
+                            <span class="acesso-status ${status}">${statusText}</span>
                         </div>
-                        <span class="log-ip">${log.sessionId ? log.sessionId.substring(0, 8) : '---'}</span>
+                        <div class="acesso-info">
+                            📅 ${data}<br>
+                            🌐 ${a.localizacao?.timezone || '---'} | 
+                            📱 ${plataforma} | 
+                            🖥️ ${tela}
+                        </div>
+                        <div class="acesso-device">
+                            <span>🌐 ${dispositivo.navegador || '---'}</span>
+                            <span>💻 ${dispositivo.nucleos || '--'} cores</span>
+                            <span>📡 ${a.localizacao?.fonte || 'timezone'}</span>
+                        </div>
+                        ${tempoText ? `<div class="acesso-tempo">${tempoText}</div>` : ''}
                     </div>
                 `;
             }).join('');
         }
 
-        async function limparLogs() {
-            if (!confirm('Tem certeza que deseja apagar todo o histórico de logs?')) return;
+        function atualizarContador(total) {
+            document.getElementById('contadorAcessos').textContent = `(${total})`;
+        }
+
+        function filtrarAcessos(filtro) {
+            filtroAtual = filtro;
+            document.querySelectorAll('.btn-filtro').forEach(btn => {
+                btn.classList.remove('ativo');
+            });
+            event.target.classList.add('ativo');
+            carregarAcessos();
+        }
+
+        async function limparTodosAcessos() {
+            if (!confirm('⚠️ ATENÇÃO!\n\nIsso apagará TODO o histórico de acessos permanentemente.\n\nTem certeza?')) return;
             
-            if (usandoFirebase) {
-                try {
-                    await db.ref('logs').remove();
-                } catch (e) {
-                    alert('Erro ao limpar logs: ' + e.message);
-                }
-            } else {
-                localStorage.removeItem('larissa_logs');
-                renderizarLogs([]);
+            if (!confirm('Última chance!\n\nTodos os dados de visitantes serão perdidos.\n\nContinuar?')) return;
+
+            if (!usandoFirebase) {
+                alert('Firebase não disponível');
+                return;
+            }
+
+            try {
+                await db.ref('acessos').remove();
+                await db.ref('online').remove();
+                await db.ref('interacoes').remove();
+                await registrarLog('sucesso', 'Limpeza completa de acessos');
+                alert('✅ Todos os acessos foram apagados!');
+                carregarAcessos();
+                carregarEstatisticas();
+            } catch (e) {
+                alert('Erro ao limpar: ' + e.message);
             }
         }
 
@@ -795,14 +1057,13 @@
             if (usandoFirebase) {
                 try {
                     await db.ref('lancamento').set(config);
-                    await registrarLog('sucesso', `Configuração atualizada: ${JSON.stringify(config)}`);
+                    await registrarLog('sucesso', `Configuração atualizada`);
                 } catch (e) {
                     console.error("Erro Firebase:", e);
-                    alert("Erro ao salvar no Firebase: " + e.message);
+                    alert("Erro ao salvar: " + e.message);
                 }
             } else {
                 localStorage.setItem('larissa_lancamento_config', JSON.stringify(config));
-                await registrarLog('sucesso', 'Configuração local atualizada');
             }
             atualizarStatus();
         }
@@ -813,7 +1074,6 @@
                     const snapshot = await db.ref('lancamento').once('value');
                     return snapshot.val() || { liberado: false, dataLancamento: null };
                 } catch (e) {
-                    console.error("Erro ao ler Firebase:", e);
                     return { liberado: false, dataLancamento: null };
                 }
             } else {
@@ -823,7 +1083,6 @@
         }
 
         function atualizarStatus() {
-            // Listener já cuida disso em tempo real para Firebase
             if (!usandoFirebase) {
                 atualizarStatusLocal();
             }
@@ -922,7 +1181,7 @@
         }
 
         function inicializarPainel() {
-            // Iniciar listener em tempo real do Firebase
+            // Listener em tempo real do lançamento
             if (usandoFirebase) {
                 db.ref('lancamento').on('value', (snapshot) => {
                     const config = snapshot.val() || { liberado: false, dataLancamento: null };
@@ -969,7 +1228,15 @@
                 atualizarStatusLocal();
             }
 
-            carregarLogs();
+            // Carregar dados
+            carregarAcessos();
+            carregarEstatisticas();
+
+            // Atualizar estatísticas a cada 10 segundos
+            setInterval(() => {
+                carregarEstatisticas();
+                if (filtroAtual === 'online') carregarAcessos();
+            }, 10000);
         }
 
         // Event Listeners
